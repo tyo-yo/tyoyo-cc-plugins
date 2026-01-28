@@ -1,0 +1,17 @@
+{
+  "description": "Auto-commits changes via GitButler (but command) when Claude Code session stops",
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun \"$CLAUDE_PLUGIN_ROOT/scripts/ccbut-auto-commit.ts\"",
+            "timeout": 120
+          }
+        ]
+      }
+    ]
+  }
+}

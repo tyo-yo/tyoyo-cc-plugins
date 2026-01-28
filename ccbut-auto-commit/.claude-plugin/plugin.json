@@ -1,0 +1,11 @@
+{
+  "name": "ccbut-auto-commit",
+  "version": "1.0.0",
+  "description": "Claude Code session termination hook that auto-commits changes via GitButler (but command)",
+  "author": {
+    "name": "tyoyo"
+  },
+  "repository": "https://github.com/tyoyo/tyoyo-cc-plugins",
+  "license": "MIT",
+  "keywords": ["gitbutler", "auto-commit", "stop-hook", "git"]
+}

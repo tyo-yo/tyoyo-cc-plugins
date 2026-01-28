@@ -1,0 +1,11 @@
+{
+  "name": "copy-last-message",
+  "version": "1.0.0",
+  "description": "Claude Code session termination hook that copies the last assistant message to clipboard",
+  "author": {
+    "name": "tyoyo"
+  },
+  "repository": "https://github.com/tyoyo/tyoyo-cc-plugins",
+  "license": "MIT",
+  "keywords": ["clipboard", "stop-hook", "productivity"]
+}

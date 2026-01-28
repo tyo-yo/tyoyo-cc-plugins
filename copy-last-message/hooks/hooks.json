@@ -1,0 +1,17 @@
+{
+  "description": "Copies the last assistant message to clipboard when Claude Code session stops",
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun \"$CLAUDE_PLUGIN_ROOT/scripts/copy-last-message.ts\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

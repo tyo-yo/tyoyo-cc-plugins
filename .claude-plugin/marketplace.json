@@ -1,0 +1,34 @@
+{
+  "name": "tyoyo-cc-plugins",
+  "owner": {
+    "name": "tyo-yo"
+  },
+  "metadata": {
+    "description": "Personal Claude Code plugins collection: clipboard hooks, GitButler auto-commit, and more",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "copy-last-message",
+      "source": "./copy-last-message",
+      "description": "Copies the last assistant message to clipboard when a Claude Code session stops",
+      "version": "1.0.0",
+      "author": {
+        "name": "tyo-yo"
+      },
+      "license": "MIT",
+      "keywords": ["clipboard", "stop-hook", "productivity"]
+    },
+    {
+      "name": "ccbut-auto-commit",
+      "source": "./ccbut-auto-commit",
+      "description": "Auto-commits changes via GitButler (but command) when a Claude Code session stops",
+      "version": "1.0.0",
+      "author": {
+        "name": "tyo-yo"
+      },
+      "license": "MIT",
+      "keywords": ["gitbutler", "auto-commit", "stop-hook", "git"]
+    }
+  ]
+}
