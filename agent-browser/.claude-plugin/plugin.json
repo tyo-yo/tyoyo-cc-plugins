@@ -1,0 +1,11 @@
+{
+  "name": "agent-browser",
+  "version": "1.0.0",
+  "description": "Browser automation with agent-browser CLI - AI-first design with CDP support for authenticated sessions",
+  "author": {
+    "name": "tyoyo"
+  },
+  "repository": "https://github.com/tyoyo/tyoyo-cc-plugins",
+  "license": "MIT",
+  "keywords": ["browser", "automation", "cdp", "chrome", "scraping", "testing"]
+}
