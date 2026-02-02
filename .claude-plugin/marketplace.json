@@ -40,6 +40,17 @@
       },
       "license": "MIT",
       "keywords": ["google", "gmail", "calendar", "drive", "tasks", "workspace"]
+    },
+    {
+      "name": "agent-browser",
+      "source": "./agent-browser",
+      "description": "Browser automation with agent-browser CLI - AI-first design with CDP support for authenticated sessions",
+      "version": "1.0.0",
+      "author": {
+        "name": "tyo-yo"
+      },
+      "license": "MIT",
+      "keywords": ["browser", "automation", "cdp", "chrome", "scraping", "testing"]
     }
   ]
 }
