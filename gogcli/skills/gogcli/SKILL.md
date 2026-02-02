@@ -51,6 +51,24 @@ gog calendar delete primary <eventId>
 
 **注意**: `events`はデフォルトで`primary`カレンダー。他のカレンダーは`gog calendar calendars`で確認。
 
+### メンバー検索 & ミーティング設定
+
+```bash
+# 1. メンバーを検索（名前やメールで）
+gog people search "yamada"
+
+# 2. 複数人の空き状況を確認
+gog calendar freebusy "user1@example.com,user2@example.com" --from "2024-01-15T10:00:00+09:00" --to "2024-01-15T17:00:00+09:00"
+
+# 3. ミーティング作成（Google Meet付き）
+gog calendar create primary --summary "会議" --from "2024-01-15T10:00:00+09:00" --to "2024-01-15T11:00:00+09:00" --attendees "user1@example.com,user2@example.com" --with-meet
+```
+
+**重要**:
+- 時刻は必ずJST（`+09:00`）で指定する
+- 営業時間は10:00-17:00を基本とする（18:00-19:00は避ける）
+- ミーティング作成時は必ず`--with-meet`を付けてGoogle Meetリンクを生成する
+
 ---
 
 ## Drive (`gog drive`)
