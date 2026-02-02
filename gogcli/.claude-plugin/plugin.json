@@ -1,0 +1,11 @@
+{
+  "name": "gogcli",
+  "version": "1.0.0",
+  "description": "Google Workspace CLI (gogcli) skills for Gmail, Calendar, Drive, and Tasks operations",
+  "author": {
+    "name": "tyoyo"
+  },
+  "repository": "https://github.com/tyoyo/tyoyo-cc-plugins",
+  "license": "MIT",
+  "keywords": ["google", "gmail", "calendar", "drive", "tasks", "workspace"]
+}

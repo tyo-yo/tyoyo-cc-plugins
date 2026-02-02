@@ -29,6 +29,17 @@
       },
       "license": "MIT",
       "keywords": ["gitbutler", "auto-commit", "stop-hook", "git"]
+    },
+    {
+      "name": "gogcli",
+      "source": "./gogcli",
+      "description": "Google Workspace CLI (gogcli) skills for Gmail, Calendar, Drive, and Tasks operations",
+      "version": "1.0.0",
+      "author": {
+        "name": "tyo-yo"
+      },
+      "license": "MIT",
+      "keywords": ["google", "gmail", "calendar", "drive", "tasks", "workspace"]
     }
   ]
 }
