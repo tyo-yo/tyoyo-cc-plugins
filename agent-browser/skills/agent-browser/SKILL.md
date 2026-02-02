@@ -152,3 +152,4 @@ agent-browser --cdp 9222 get html ".data-table"
 | ref が見つからない | `snapshot -i -c` を再実行 |
 | クリックが効かない | `wait @e1` で待機してから実行 |
 | ページ遷移後にエラー | `snapshot` を再実行して新しい ref を取得 |
+| ダウンロードしたファイルが見つからない | CDP モードでは `/var/folders/.../playwright-artifacts-*/` に保存される場合がある。`find /var/folders -name "ファイル名の一部" 2>/dev/null` で検索 |
