@@ -54,6 +54,9 @@ gog calendar delete primary <eventId>
 ### メンバー検索 & ミーティング設定
 
 ```bash
+# 0. 自分のメールアドレスを確認
+gog auth list
+
 # 1. メンバーを検索（名前やメールで）
 gog people search "yamada"
 
@@ -68,6 +71,7 @@ gog calendar create primary --summary "会議" --from "2024-01-15T10:00:00+09:00
 - 時刻は必ずJST（`+09:00`）で指定する
 - 営業時間は10:00-17:00を基本とする（18:00-19:00は避ける）
 - ミーティング作成時は必ず`--with-meet`を付けてGoogle Meetリンクを生成する
+- **`--attendees`で参加者を指定する場合、自分自身も忘れずに含める**（`gog auth list`で確認可能）
 
 ---
 
