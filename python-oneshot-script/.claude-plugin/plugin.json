@@ -1,0 +1,11 @@
+{
+  "name": "python-oneshot-script",
+  "version": "1.0.0",
+  "description": "PEP 723インラインメタデータを使ったPython単発スクリプトの書き方ガイドライン",
+  "author": {
+    "name": "tyoyo"
+  },
+  "repository": "https://github.com/tyoyo/tyoyo-cc-plugins",
+  "license": "MIT",
+  "keywords": ["python", "uv", "pep723", "script", "inline-metadata"]
+}

@@ -51,6 +51,17 @@
       },
       "license": "MIT",
       "keywords": ["browser", "automation", "cdp", "chrome", "scraping", "testing"]
+    },
+    {
+      "name": "python-oneshot-script",
+      "source": "./python-oneshot-script",
+      "description": "PEP 723インラインメタデータを使ったPython単発スクリプトの書き方ガイドライン",
+      "version": "1.0.0",
+      "author": {
+        "name": "tyo-yo"
+      },
+      "license": "MIT",
+      "keywords": ["python", "uv", "pep723", "script", "inline-metadata"]
     }
   ]
 }
