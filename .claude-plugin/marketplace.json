@@ -80,6 +80,24 @@
       },
       "license": "MIT",
       "keywords": ["mcpc", "mcp", "cli", "pipe", "notion", "batch"]
+    },
+    {
+      "name": "ntfy-claude-runner",
+      "source": "./ntfy-claude-runner",
+      "description": "Event-driven Claude Code execution via ntfy.sh notifications and Zellij terminal panes",
+      "version": "0.1.0",
+      "author": {
+        "name": "tyo-yo"
+      },
+      "license": "MIT",
+      "keywords": [
+        "ntfy",
+        "zellij",
+        "automation",
+        "event-driven",
+        "daemon",
+        "trigger"
+      ]
     }
   ]
 }

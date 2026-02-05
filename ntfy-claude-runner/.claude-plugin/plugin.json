@@ -1,0 +1,11 @@
+{
+  "name": "ntfy-claude-runner",
+  "version": "0.1.0",
+  "description": "Event-driven Claude Code execution via ntfy.sh notifications and Zellij terminal panes",
+  "author": {
+    "name": "tyo-yo"
+  },
+  "repository": "https://github.com/tyoyo/tyoyo-cc-plugins",
+  "license": "MIT",
+  "keywords": ["ntfy", "zellij", "automation", "event-driven", "daemon"]
+}
