@@ -1,0 +1,7 @@
+{
+  "name": "mcpc",
+  "version": "1.0.0",
+  "description": "MCP tools via Unix pipes with mcpc CLI - bypass LLM context for file-based input and large output filtering",
+  "author": { "name": "tyo-yo" },
+  "license": "MIT"
+}

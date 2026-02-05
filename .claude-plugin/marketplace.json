@@ -50,7 +50,14 @@
         "name": "tyo-yo"
       },
       "license": "MIT",
-      "keywords": ["browser", "automation", "cdp", "chrome", "scraping", "testing"]
+      "keywords": [
+        "browser",
+        "automation",
+        "cdp",
+        "chrome",
+        "scraping",
+        "testing"
+      ]
     },
     {
       "name": "python-oneshot-script",
@@ -62,6 +69,17 @@
       },
       "license": "MIT",
       "keywords": ["python", "uv", "pep723", "script", "inline-metadata"]
+    },
+    {
+      "name": "mcpc",
+      "source": "./mcpc",
+      "description": "MCP tools via Unix pipes with mcpc CLI - bypass LLM context for file-based input and large output filtering",
+      "version": "1.0.0",
+      "author": {
+        "name": "tyo-yo"
+      },
+      "license": "MIT",
+      "keywords": ["mcpc", "mcp", "cli", "pipe", "notion", "batch"]
     }
   ]
 }
