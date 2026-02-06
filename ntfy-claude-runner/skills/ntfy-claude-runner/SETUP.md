@@ -1,13 +1,16 @@
 # ntfy-claude-runner セットアップガイド
 
+> **このガイドに含まれるコマンドはすべてユーザー自身が別ターミナルで実行すること。**
+> Claude はトピック名を含む秘匿情報に触れないよう設計されている。
+> Claude の役割は手順の案内とトラブルシューティングのみ。
+
 ## 前提条件
 
-以下がインストール済みであること:
+以下がインストール済みであること（別ターミナルで確認）:
 
 ```bash
-# 確認コマンド
 which uv       # Python パッケージマネージャー
-which zellij   # ターミナルマルチプレクサー
+which zellij   # ターミナルマルチプレクサー（interactive タスク用）
 which claude   # Claude Code CLI
 ```
 
@@ -17,66 +20,77 @@ which claude   # Claude Code CLI
 # uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# zellij
+# zellij（interactive タスクを使う場合のみ必要）
 brew install zellij
 
 # claude (Claude Code)
 # https://docs.anthropic.com/en/docs/claude-code
 ```
 
+### 依存パッケージ
+
+デーモンは `uv run --script` で実行されるため、依存パッケージは自動インストールされる:
+
+- `textual>=1.0` — TUI フレームワーク（rich を内包）
+- `httpx` — HTTP クライアント（ntfy.sh ストリーム購読）
+- `sh>=2.0` — シェルコマンドラッパー（Zellij 操作）
+
 ---
 
-## Step 1: ntfy トピック名の生成
+## Step 1: 初期設定
+
+**以下を別ターミナルで実行すること。**
+
+### 1-1. ntfy トピック名の生成
 
 セキュリティのため、推測されにくいランダムなトピック名を使う。
-**以下のコマンドをユーザー自身で実行し、結果を安全に保管すること。**
 
 ```bash
-# ランダムなトピック名を生成
-echo "ntfy-claude-$(openssl rand -hex 8)"
+NTFY_TOPIC="ntfy-claude-$(openssl rand -hex 8)" && echo "export NTFY_TOPIC=\"$NTFY_TOPIC\"" >> ~/.zshrc && export NTFY_TOPIC && echo "Done"
 ```
 
-生成されたトピック名を `.zshrc` や `.bashrc` に環境変数として設定:
+> **重要**: トピック名は ntfy.sh 上で認証なしにアクセスできるため、ランダムな文字列をパスワード代わりに使う。トピック名を第三者や Claude に共有しないこと。
+
+### 1-2. デーモン起動コマンドの登録
 
 ```bash
-# .zshrc に追加（ユーザーが手動で実行）
-echo 'export NTFY_CLAUDE_TOPIC="<生成したトピック名>"' >> ~/.zshrc
-source ~/.zshrc
+echo "alias ntfy-claude='uv run https://raw.githubusercontent.com/tyo-yo/tyoyo-cc-plugins/main/ntfy-claude-runner/skills/ntfy-claude-runner/resources/ntfy-claude-daemon.py'" >> ~/.zshrc && source <(echo "alias ntfy-claude='uv run https://raw.githubusercontent.com/tyo-yo/tyoyo-cc-plugins/main/ntfy-claude-runner/skills/ntfy-claude-runner/resources/ntfy-claude-daemon.py'") && echo "Done"
 ```
-
-> **重要**: トピック名は ntfy.sh 上で認証なしにアクセスできるため、ランダムな文字列をパスワード代わりに使う。トピック名を第三者に共有しないこと。
 
 ---
 
-## Step 2: デーモンスクリプトの配置
+## Step 2: 動作確認
+
+**ターミナル A** でデーモンをフォアグラウンド起動:
 
 ```bash
-# スクリプトを配置
-mkdir -p ~/scripts
-cp "${CLAUDE_PLUGIN_ROOT}/skills/ntfy-claude-runner/resources/ntfy-claude-daemon.py" ~/scripts/
-chmod +x ~/scripts/ntfy-claude-daemon.py
+ntfy-claude
 ```
 
-動作確認（フォアグラウンドで実行）:
+TUI ダッシュボードが表示され、ステータスバーに「Connected」と表示されることを確認。
+
+**ターミナル B** からテスト送信:
 
 ```bash
-NTFY_TOPIC="$NTFY_CLAUDE_TOPIC" uv run ~/scripts/ntfy-claude-daemon.py
+# auto タスク（TUI に結果が表示される）
+curl -d '{"type":"auto","prompt":"Say hello"}' "ntfy.sh/$NTFY_TOPIC"
+
+# interactive タスク（Zellij ペインが開く。Zellij セッションが必要）
+curl -d "hello test" "ntfy.sh/$NTFY_TOPIC"
 ```
 
-別のターミナルからテスト送信:
+auto タスクの場合: TUI の一覧に「⏳ → >> → OK」とステータスが遷移し、Enter で詳細表示できれば成功。
 
-```bash
-curl -d "hello test" "ntfy.sh/$NTFY_CLAUDE_TOPIC"
-```
-
-Zellij の "main" セッションに新しいペインが開いて Claude Code が起動すれば成功。
+確認後、TUI で `q` を押して終了する。
 
 ---
 
-## Step 3: Zellij レイアウトの配置（任意）
+## Step 3: Zellij レイアウトの配置（interactive タスクを使う場合）
 
 デフォルトの Zellij レイアウトは12ペインまでしかタイルド表示しない。
 20ペインまで対応するカスタムレイアウトを使う場合:
+
+**別ターミナルで実行:**
 
 ```bash
 mkdir -p ~/.config/zellij/layouts
@@ -94,58 +108,26 @@ zellij --layout claude-tasks --session main
 
 ## Step 4: launchd でデーモン化（任意）
 
-ログイン時に自動起動し、クラッシュ時に自動復旧させる。
+> **注意**: TUI モードは TTY が必要なため、launchd での自動起動には向かない。
+> launchd を使う場合は headless モード（将来検討）が必要。
+> 現時点ではターミナルでの手動起動を推奨する。
 
-### 4-1. plist テンプレートをコピー
-
-```bash
-cp "${CLAUDE_PLUGIN_ROOT}/skills/ntfy-claude-runner/resources/com.user.ntfy-claude.plist" \
-   ~/Library/LaunchAgents/
-```
-
-### 4-2. plist 内のプレースホルダーを置換
-
-以下のコマンドで各値を確認し、plist を編集:
-
-```bash
-echo "UV_PATH: $(which uv)"
-echo "HOME: $HOME"
-echo "PATH: $PATH"
-echo "TOPIC: $NTFY_CLAUDE_TOPIC"
-echo "SCRIPT: $HOME/scripts/ntfy-claude-daemon.py"
-```
-
-**ユーザーが `~/Library/LaunchAgents/com.user.ntfy-claude.plist` を手動で編集して、
-`__UV_PATH__`, `__HOME__`, `__PATH__`, `__NTFY_TOPIC__`, `__DAEMON_SCRIPT_PATH__` を
-上記の値で置換すること。**
-
-### 4-3. ログディレクトリの作成
-
-```bash
-mkdir -p ~/.local/share/ntfy-claude
-```
-
-### 4-4. 起動
-
-```bash
-launchctl load ~/Library/LaunchAgents/com.user.ntfy-claude.plist
-```
-
-### 4-5. 確認
-
-```bash
-# 起動確認
-launchctl list | grep ntfy-claude
-
-# ログ確認
-tail -f ~/.local/share/ntfy-claude/stderr.log
-```
+従来の launchd 設定を使いたい場合は `com.user.ntfy-claude.plist` テンプレートを参照。
+ただし、TUI が表示されないためログ確認のみの用途となる。
 
 ---
 
 ## トラブルシューティング
 
-### Zellij セッション "main" が見つからない
+### TUI が表示されない / 文字化けする
+
+ターミナルが True Color に対応していることを確認。以下のターミナルを推奨:
+- iTerm2
+- WezTerm
+- Ghostty
+- kitty
+
+### Zellij セッション "main" が見つからない（interactive タスク）
 
 デーモンは既存の Zellij セッションにペインを追加する。セッションが存在しない場合はエラーになる。
 
@@ -160,9 +142,18 @@ zellij --session main
 ### ntfy.sh への接続が切れる
 
 デーモンは自動再接続する（指数バックオフ: 1s → 2s → 4s → ... → 60s）。
+ステータスバーに「Disconnected」と表示されるが、再接続後は自動で「Connected」に復帰する。
 再接続時に `since=` パラメータで未処理メッセージをキャッチアップする。
 
 ### Mac スリープ後にメッセージが漏れる
 
 ntfy.sh はメッセージを12時間キャッシュする。スリープ復帰後の再接続時に
 `since=<最後のタイムスタンプ>` でキャッチアップするため、12時間以内のスリープなら漏れない。
+
+### auto タスクがタイムアウトする
+
+デフォルトのタイムアウトは10分（600秒）。変更する場合:
+
+```bash
+CLAUDE_TIMEOUT=300 ntfy-claude   # 5分に変更
+```
