@@ -467,6 +467,10 @@ class NtfyClaudeApp(App):
         msg_id = msg.get("id", str(msg.get("time", "")))
         msg_time = msg.get("time", int(time.time()))
 
+        # Skip if already processed (dedup on restart)
+        if self.store.get(msg_id):
+            return
+
         try:
             payload = json.loads(body)
             task_type = payload.get("type", "interactive")
