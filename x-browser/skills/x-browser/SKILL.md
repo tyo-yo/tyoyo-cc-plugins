@@ -20,41 +20,21 @@ agent-browser (`ab`) 経由で X/Twitter の情報を取得する。
 # 1. 検索URLを開く（演算子でフィルタ）
 ab open "https://x.com/search?q=QUERY&src=typed_query&f=top"
 
-# 2. スクロール＋蓄積でツイートを一括抽出（仮想スクロール対策）
-ab eval '(async()=>{
-  const collected = new Map();
-  function harvest() {
-    for (const a of document.querySelectorAll("article")) {
-      const time = a.querySelector("time");
-      if (!time) continue;
-      const link = time.closest("a")?.href || "";
-      if (collected.has(link)) continue;
-      const un = a.querySelector("[data-testid=\"User-Name\"]")?.innerText?.split("\n") || [];
-      const tt = a.querySelector("[data-testid=\"tweetText\"]")?.innerText || "";
-      collected.set(link, {
-        author: un[0] || "",
-        handle: un[1] || "",
-        date: (time.getAttribute("datetime")||"").split("T")[0],
-        text: tt.substring(0, 280),
-        url: link
-      });
-    }
-  }
-  harvest();
-  for (let i = 0; i < 30; i++) {
-    window.scrollBy(0, 2000);
-    await new Promise(r => setTimeout(r, 600));
-    harvest();
-  }
-  return JSON.stringify({total: collected.size, tweets: [...collected.values()]}, null, 2);
-})()'
+# 2. スクロール＋蓄積（10回スクロール、約7秒で完了）
+SCROLL_JS="${CLAUDE_PLUGIN_ROOT}/scripts/scroll-harvest.js"
+ab eval "$(cat "$SCROLL_JS")"
+
+# 3. もっと取りたい場合は同じコマンドを繰り返す（スクロール位置が引き継がれる）
+ab eval "$(cat "$SCROLL_JS")"
 ```
 
 **ポイント**:
-- X は仮想スクロール（画面外 DOM を削除）するため、`Map` で蓄積しながらスクロールする
-- スクロール回数 30 回で約 50〜70 件取得可能
+- スクリプトは `scripts/scroll-harvest.js` に配置済み。毎回書く必要なし
+- 1回の実行で 10 スクロール（約7秒）→ CDP タイムアウトを回避
+- X は仮想スクロール（画面外 DOM を削除）するため、Map で蓄積しながらスクロールする
 - 広告ツイート（`time` 要素なし）は自動スキップ
 - `f=top`（話題）の代わりに `f=live`（最新）も使える
+- 繰り返し実行するとスクロール位置が引き継がれ、新しいツイートを追加取得できる
 
 ### 高度な検索演算子
 
@@ -150,7 +130,7 @@ ab open "https://x.com/home"
 ab open "https://x.com/home?tab=following"
 ```
 
-タイムラインを開いた後は **X 検索と同じ JS 蓄積スクロール** でツイートを抽出する（セクション1のスクリプトをそのまま使う）。
+タイムラインを開いた後は **X 検索と同じスクロールスクリプト** でツイートを抽出する（セクション1のステップ2〜3をそのまま使う）。
 
 **`x.com/home` vs `x.com/home?tab=following`**:
 - `home`: おすすめアルゴリズム（話題のポストが上位に来る）
@@ -202,4 +182,5 @@ ab snapshot -c
 | 検索結果が少ない | `min_faves` を下げる、日付範囲を広げる、`f=live` に切り替え |
 | Grok が応答しない | 120 秒待っても完了しない場合はページリロードして再送信 |
 | スクロールでツイートが増えない | 検索結果がそもそも少ない可能性。条件を緩くする |
+| `ab eval` で Resource temporarily unavailable | eval の実行時間が長すぎる。スクロール回数を5回以下に分割し、`window.__tweets` で状態を保持する |
 | grok.com の入力が効かない | `ab eval` の引用符のエスケープを確認。シングルクォート内にダブルクォートを使う |
