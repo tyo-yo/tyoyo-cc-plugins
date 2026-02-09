@@ -534,7 +534,7 @@ class NtfyClaudeApp(App):
                     "claude", "-p", job.prompt,
                     "--output-format", "stream-json",
                     "--verbose",
-                    "--max-turns", "10",
+                    "--max-turns", "100",
                     "--dangerously-skip-permissions",
                 ],
                 capture_output=True,
