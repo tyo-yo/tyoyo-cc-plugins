@@ -131,6 +131,24 @@
         "speech-to-text",
         "whisper"
       ]
+    },
+    {
+      "name": "x-browser",
+      "source": "./x-browser",
+      "description": "X/Twitterの情報取得スキル - agent-browser経由で検索・Grokリサーチ・タイムライン読み取り",
+      "version": "1.0.0",
+      "author": {
+        "name": "tyo-yo"
+      },
+      "license": "MIT",
+      "keywords": [
+        "x",
+        "twitter",
+        "grok",
+        "search",
+        "timeline",
+        "agent-browser"
+      ]
     }
   ]
 }

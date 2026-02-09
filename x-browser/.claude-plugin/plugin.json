@@ -1,0 +1,11 @@
+{
+  "name": "x-browser",
+  "version": "1.0.0",
+  "description": "X/Twitter の情報取得スキル - agent-browser 経由で検索・Grokリサーチ・タイムライン読み取り",
+  "author": {
+    "name": "tyo-yo"
+  },
+  "repository": "https://github.com/tyoyo/tyoyo-cc-plugins",
+  "license": "MIT",
+  "keywords": ["x", "twitter", "grok", "search", "timeline", "agent-browser"]
+}
