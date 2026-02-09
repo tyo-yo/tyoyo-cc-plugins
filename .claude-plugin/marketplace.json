@@ -115,6 +115,22 @@
         "summary",
         "yt-dlp"
       ]
+    },
+    {
+      "name": "superwhisper-transcribe",
+      "source": "./superwhisper-transcribe",
+      "description": "SuperWhisperを使った音声ファイルの文字起こし（CLIからファイルを渡してテキスト取得）",
+      "version": "1.0.0",
+      "author": {
+        "name": "tyo-yo"
+      },
+      "license": "MIT",
+      "keywords": [
+        "superwhisper",
+        "transcribe",
+        "speech-to-text",
+        "whisper"
+      ]
     }
   ]
 }

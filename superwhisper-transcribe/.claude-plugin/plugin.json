@@ -1,0 +1,11 @@
+{
+  "name": "superwhisper-transcribe",
+  "version": "1.0.0",
+  "description": "SuperWhisperを使った音声ファイルの文字起こし",
+  "author": {
+    "name": "tyo-yo"
+  },
+  "repository": "https://github.com/tyoyo/tyoyo-cc-plugins",
+  "license": "MIT",
+  "keywords": ["superwhisper", "transcribe", "speech-to-text", "whisper"]
+}
