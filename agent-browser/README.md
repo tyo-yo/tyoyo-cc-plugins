@@ -5,25 +5,23 @@ Claude Code plugin for browser automation using [agent-browser](https://github.c
 ## Features
 
 - AI-first browser automation with accessibility tree snapshots
-- CDP mode for connecting to existing Chrome sessions (with authentication)
+- Chrome 144+ のリモートデバッグ機能で普段使いの Chrome にそのまま CDP 接続
+- 専用プロファイルや Chrome の再起動が不要
 - 50+ commands for navigation, forms, screenshots, network, storage
 
 ## Prerequisites
 
-- [agent-browser](https://github.com/vercel-labs/agent-browser) installed
-- Chrome with CDP enabled (via `chrome-debug` command)
+- [agent-browser](https://github.com/vercel-labs/agent-browser) v0.9.0+
+- Chrome 144+ with remote debugging enabled via `chrome://inspect/#remote-debugging`
 
 ## Quick Start
 
-1. Start Chrome in CDP mode (separate terminal):
-   ```bash
-   chrome-debug
-   ```
+1. Chrome で `chrome://inspect/#remote-debugging` を開いてリモートデバッグを有効化
 
 2. Use agent-browser:
    ```bash
-   agent-browser --cdp 9222 open https://example.com
-   agent-browser --cdp 9222 snapshot -i -c
+   ab open https://example.com
+   ab snapshot -i -c
    ```
 
 ## Files

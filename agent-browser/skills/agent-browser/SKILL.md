@@ -1,24 +1,23 @@
 ---
 name: agent-browser
 description: This skill should be used when the user asks to "automate browser", "scrape website", "take screenshot of page", "fill form automatically", "click button on page", "interact with web page", "use agent-browser", "connect to Chrome with CDP", "browser automation", or needs to control a web browser programmatically for testing, scraping, or automation tasks.
-allowed-tools: Bash(agent-browser:*)
+allowed-tools: Bash(agent-browser:*), Bash(ab:*), Bash(ab *), Bash(cdp-url)
 ---
 
 # agent-browser - Browser Automation CLI
 
 公式: https://github.com/vercel-labs/agent-browser
 
-**前提**: `chrome-debug` コマンドで Chrome が CDP モードで起動済みであること。
+**前提**: Chrome で `chrome://inspect/#remote-debugging` のリモートデバッグが有効であること。
 
 ## CDP 接続確認
 
 ```bash
-# 接続テスト
-agent-browser --cdp 9222 get url
+ab get url
 ```
 
-**接続失敗時**: ユーザーに別ターミナルで `chrome-debug` を実行してもらう。
-セットアップが必要な場合は `SETUP.md` を参照。
+**接続失敗時**: ユーザーに Chrome で `chrome://inspect/#remote-debugging` を開いてリモートデバッグを有効化してもらう。
+セットアップが必要な場合は `SETUP.md` を参照。セットアップの中で `ab` というエイリアス名を使うが、ユーザーに `ab` で良いか確認してから進めること。
 
 ---
 
@@ -26,17 +25,17 @@ agent-browser --cdp 9222 get url
 
 ```bash
 # 1. ページを開く
-agent-browser --cdp 9222 open https://example.com
+ab open https://example.com
 
 # 2. インタラクティブ要素を取得（-c で空要素を除去）
-agent-browser --cdp 9222 snapshot -i -c
+ab snapshot -i -c
 
 # 3. 要素を操作（@e1, @e2 などの ref を使用）
-agent-browser --cdp 9222 click @e3
-agent-browser --cdp 9222 fill @e5 "text"
+ab click @e3
+ab fill @e5 "text"
 
 # 4. ページ変更後は必ず再snapshot
-agent-browser --cdp 9222 snapshot -i -c
+ab snapshot -i -c
 ```
 
 **重要**: クリック、入力、ナビゲーション後は必ず `snapshot` を再実行。DOM変更で ref が無効になる。
@@ -47,53 +46,53 @@ agent-browser --cdp 9222 snapshot -i -c
 
 ### ナビゲーション
 ```bash
-agent-browser --cdp 9222 open <url>       # URL を開く
-agent-browser --cdp 9222 back             # 戻る
-agent-browser --cdp 9222 forward          # 進む
-agent-browser --cdp 9222 reload           # リロード
+ab open <url>       # URL を開く
+ab back             # 戻る
+ab forward          # 進む
+ab reload           # リロード
 ```
 
 ### スナップショット（AI にとって最重要）
 ```bash
-agent-browser --cdp 9222 snapshot -i      # インタラクティブ要素のみ
-agent-browser --cdp 9222 snapshot -i -c   # コンパクト表示（推奨）
-agent-browser --cdp 9222 snapshot -d 5    # 深度制限
-agent-browser --cdp 9222 snapshot -s "form"  # セレクタでスコープ
+ab snapshot -i      # インタラクティブ要素のみ
+ab snapshot -i -c   # コンパクト表示（推奨）
+ab snapshot -d 5    # 深度制限
+ab snapshot -s "form"  # セレクタでスコープ
 ```
 
 ### インタラクション
 ```bash
-agent-browser --cdp 9222 click @e1        # クリック
-agent-browser --cdp 9222 fill @e2 "text"  # クリア＆入力
-agent-browser --cdp 9222 type @e2 "text"  # 追記入力
-agent-browser --cdp 9222 press Enter      # キー押下
-agent-browser --cdp 9222 select @e3 "option"  # ドロップダウン
-agent-browser --cdp 9222 check @e4        # チェックボックス
-agent-browser --cdp 9222 scroll down 500  # スクロール
+ab click @e1        # クリック
+ab fill @e2 "text"  # クリア＆入力
+ab type @e2 "text"  # 追記入力
+ab press Enter      # キー押下
+ab select @e3 "option"  # ドロップダウン
+ab check @e4        # チェックボックス
+ab scroll down 500  # スクロール
 ```
 
 ### 情報取得
 ```bash
-agent-browser --cdp 9222 get text @e1     # テキスト
-agent-browser --cdp 9222 get html @e1     # HTML
-agent-browser --cdp 9222 get value @e1    # input の value
-agent-browser --cdp 9222 get url          # 現在の URL
-agent-browser --cdp 9222 get title        # ページタイトル
+ab get text @e1     # テキスト
+ab get html @e1     # HTML
+ab get value @e1    # input の value
+ab get url          # 現在の URL
+ab get title        # ページタイトル
 ```
 
 ### スクリーンショット
 ```bash
-agent-browser --cdp 9222 screenshot              # 表示領域
-agent-browser --cdp 9222 screenshot -f           # 全体
-agent-browser --cdp 9222 screenshot output.png   # パス指定
-agent-browser --cdp 9222 pdf output.pdf          # PDF保存
+ab screenshot              # 表示領域
+ab screenshot -f           # 全体
+ab screenshot output.png   # パス指定
+ab pdf output.pdf          # PDF保存
 ```
 
 ### タブ操作
 ```bash
-agent-browser --cdp 9222 tab list         # タブ一覧
-agent-browser --cdp 9222 tab new          # 新規タブ
-agent-browser --cdp 9222 tab close        # タブを閉じる
+ab tab list         # タブ一覧
+ab tab new          # 新規タブ
+ab tab close        # タブを閉じる
 ```
 
 ---
@@ -101,10 +100,10 @@ agent-browser --cdp 9222 tab close        # タブを閉じる
 ## 待機・状態確認
 
 ```bash
-agent-browser --cdp 9222 wait @e1         # 要素の出現を待つ
-agent-browser --cdp 9222 wait 2000        # ミリ秒待機
-agent-browser --cdp 9222 is visible @e1   # 表示確認
-agent-browser --cdp 9222 is enabled @e1   # 有効確認
+ab wait @e1         # 要素の出現を待つ
+ab wait 2000        # ミリ秒待機
+ab is visible @e1   # 表示確認
+ab is enabled @e1   # 有効確認
 ```
 
 ---
@@ -114,9 +113,9 @@ agent-browser --cdp 9222 is enabled @e1   # 有効確認
 ref が見つからない場合:
 
 ```bash
-agent-browser --cdp 9222 find role button click --name "Submit"
-agent-browser --cdp 9222 find text "ログイン" click
-agent-browser --cdp 9222 find label "メールアドレス" fill "user@example.com"
+ab find role button click --name "Submit"
+ab find text "ログイン" click
+ab find label "メールアドレス" fill "user@example.com"
 ```
 
 ---
@@ -125,21 +124,21 @@ agent-browser --cdp 9222 find label "メールアドレス" fill "user@example.c
 
 ### フォーム送信
 ```bash
-agent-browser --cdp 9222 open https://example.com/login
-agent-browser --cdp 9222 snapshot -i -c
-agent-browser --cdp 9222 fill @e3 "username"
-agent-browser --cdp 9222 fill @e4 "password"
-agent-browser --cdp 9222 click @e5
-agent-browser --cdp 9222 wait 2000
-agent-browser --cdp 9222 snapshot -i -c
+ab open https://example.com/login
+ab snapshot -i -c
+ab fill @e3 "username"
+ab fill @e4 "password"
+ab click @e5
+ab wait 2000
+ab snapshot -i -c
 ```
 
 ### データ抽出
 ```bash
-agent-browser --cdp 9222 open https://example.com/data
-agent-browser --cdp 9222 snapshot -i -c
-agent-browser --cdp 9222 get text @e1
-agent-browser --cdp 9222 get html ".data-table"
+ab open https://example.com/data
+ab snapshot -i -c
+ab get text @e1
+ab get html ".data-table"
 ```
 
 ---
@@ -148,8 +147,9 @@ agent-browser --cdp 9222 get html ".data-table"
 
 | 問題 | 解決策 |
 |------|--------|
-| `Failed to connect via CDP` | `chrome-debug` を別ターミナルで実行 |
-| ref が見つからない | `snapshot -i -c` を再実行 |
-| クリックが効かない | `wait @e1` で待機してから実行 |
-| ページ遷移後にエラー | `snapshot` を再実行して新しい ref を取得 |
+| `DevToolsActivePort not found` | Chrome で `chrome://inspect/#remote-debugging` を開いてリモートデバッグを有効化 |
+| `Failed to connect via CDP` | Chrome が起動しているか確認。リモートデバッグが有効か確認 |
+| ref が見つからない | `ab snapshot -i -c` を再実行 |
+| クリックが効かない | `ab wait @e1` で待機してから実行 |
+| ページ遷移後にエラー | `ab snapshot` を再実行して新しい ref を取得 |
 | ダウンロードしたファイルが見つからない | CDP モードでは `/var/folders/.../playwright-artifacts-*/` に保存される場合がある。`find /var/folders -name "ファイル名の一部" 2>/dev/null` で検索 |

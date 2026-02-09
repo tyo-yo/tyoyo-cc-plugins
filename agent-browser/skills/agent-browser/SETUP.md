@@ -1,6 +1,7 @@
 # agent-browser セットアップガイド
 
-このガイドでは、agent-browser と CDP 接続環境のセットアップ方法を説明します。
+Chrome 144+ の `chrome://inspect/#remote-debugging` を使い、普段使いの Chrome にそのまま CDP 接続する方式です。
+専用プロファイルや Chrome の再起動は不要です。
 
 ## 1. agent-browser のインストール
 
@@ -12,69 +13,51 @@ npm install -g agent-browser
 
 インストール確認:
 ```bash
-which agent-browser
-agent-browser --help
+agent-browser --version
 ```
 
-ブラウザバイナリのインストール（初回のみ）:
-```bash
-agent-browser install
-```
+**v0.9.0 以上が必要です**（`--cdp` に WebSocket URL を渡す機能が必要）。
 
 ---
 
-## 2. CDP 接続用 Chrome 環境の準備
+## 2. Chrome でリモートデバッグを有効化
 
-### なぜ専用プロファイルが必要か
+Chrome で以下の URL を開く:
 
-Chrome v136 以降、セキュリティ強化により **デフォルトプロファイルでの CDP 接続がブロック** されるようになりました。
-
-- `--remote-debugging-port` を指定しても、デフォルトプロファイルではポートが開かない
-- `--user-data-dir` で **別のディレクトリを指定する必要がある**
-
-そのため、既存の Chrome プロファイルを専用ディレクトリにコピーし、そこから CDP モードで起動します。
-
-### プロファイルのコピー（初回のみ）
-
-```bash
-# 専用プロファイルディレクトリを作成
-ditto "$HOME/Library/Application Support/Google/Chrome" "$HOME/.chrome-automation-profile"
+```
+chrome://inspect/#remote-debugging
 ```
 
-**注意**: 数GBのコピーになるため、数分かかる場合があります。
+「Allow remote debugging for this browser instance」のチェックボックスをオンにする。
+`Server running at: 127.0.0.1:9222` と表示されれば成功。
+
+> **注意**: Chrome を再起動するとリモートデバッグは無効に戻ります。再度有効化が必要です。
 
 ---
 
-## 3. chrome-debug コマンドの設定
+## 3. シェルヘルパーの設定
 
-`.zshrc` または `.bashrc` に以下を追加:
+`.zshrc` または `.bashrc` に以下を追加します。
+
+**エイリアス名の確認**: 以下では `ab` をエイリアス名として使います。既に `ab` を別の用途で使っている場合は、別の名前（例: `abr`）に変更してください。
 
 ```bash
-# Chrome CDP debug mode (for agent-browser)
-# 永続的な専用プロファイルを使用（初回のみコピー、以降は再利用）
-chrome-debug() {
-  local dst="$HOME/.chrome-automation-profile"
-
-  if pgrep -x "Google Chrome" > /dev/null; then
-    echo "Chromeを終了中..."
-    osascript -e 'quit app "Google Chrome"'
-    sleep 2
+# agent-browser CDP helper (Chrome 144+ chrome://inspect/#remote-debugging 方式)
+cdp-url() {
+  local port_file="$HOME/Library/Application Support/Google/Chrome/DevToolsActivePort"
+  if [ ! -f "$port_file" ]; then
+    echo "Error: DevToolsActivePort not found. Enable remote debugging at chrome://inspect/#remote-debugging" >&2
+    return 1
   fi
+  local port=$(sed -n '1p' "$port_file")
+  local path=$(sed -n '2p' "$port_file")
+  echo "ws://127.0.0.1:${port}${path}"
+}
 
-  # 初回のみプロファイルをコピー
-  if [ ! -d "$dst" ]; then
-    echo "初回セットアップ: プロファイルをコピー中..."
-    ditto "$HOME/Library/Application Support/Google/Chrome" "$dst"
-    echo "セットアップ完了"
-  fi
-
-  echo "CDP起動中 (port: 9222) | プロファイル: $dst"
-
-  /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
-    --remote-debugging-port=9222 \
-    --user-data-dir="$dst" \
-    --no-first-run \
-    "$@"
+ab() {
+  local ws_url
+  ws_url=$(cdp-url) || return 1
+  agent-browser --cdp "$ws_url" "$@"
 }
 ```
 
@@ -85,52 +68,35 @@ source ~/.zshrc
 
 ---
 
-## 4. 使い方
-
-### Chrome を CDP モードで起動（別ターミナルで実行）
-
-```bash
-chrome-debug
-```
-
-このターミナルは **開いたままにしておく**。
-
-### agent-browser で接続
+## 4. 動作確認
 
 ```bash
 # 接続テスト
-agent-browser --cdp 9222 get url
+ab get url
 
-# ページを開く
-agent-browser --cdp 9222 open https://example.com
-
-# スナップショット取得
-agent-browser --cdp 9222 snapshot -i -c
+# スナップショット
+ab snapshot -i -c
 ```
 
 ---
 
 ## 5. トラブルシューティング
 
-### 接続できない場合
+| 問題 | 解決策 |
+|------|--------|
+| `DevToolsActivePort not found` | Chrome で `chrome://inspect/#remote-debugging` を開いてリモートデバッグを有効化 |
+| `Failed to connect via CDP` | Chrome が起動しているか確認。リモートデバッグが有効か確認 |
+| Chrome 再起動後に接続できない | リモートデバッグは Chrome 再起動で無効に戻る。再度有効化が必要 |
+| ref が見つからない | `ab snapshot -i -c` を再実行 |
+
+### DevToolsActivePort の確認
 
 ```bash
-# CDP ポートが開いているか確認
-curl -s http://localhost:9222/json/version
+# ファイルの存在確認
+cat "$HOME/Library/Application Support/Google/Chrome/DevToolsActivePort"
 
-# Chrome プロセスを確認
-ps aux | grep "Google Chrome" | grep remote-debugging
-```
-
-### プロファイルを更新したい場合
-
-既存のプロファイルから最新の認証情報をコピーし直す:
-
-```bash
-# 既存の専用プロファイルを削除
-rm -rf "$HOME/.chrome-automation-profile"
-
-# 次回 chrome-debug 実行時に自動的に再コピーされる
+# WebSocket URL の確認
+cdp-url
 ```
 
 ---
@@ -138,5 +104,5 @@ rm -rf "$HOME/.chrome-automation-profile"
 ## 参考リンク
 
 - agent-browser 公式: https://github.com/vercel-labs/agent-browser
-- agent-browser ドキュメント: https://agent-browser.dev/
 - Chrome DevTools Protocol: https://chromedevtools.github.io/devtools-protocol/
+- Chrome リモートデバッグのセキュリティ変更: https://developer.chrome.com/blog/remote-debugging-port
