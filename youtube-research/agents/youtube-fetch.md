@@ -27,21 +27,24 @@ tools: Bash, Read
 
 ## 処理フロー
 
-各 YouTube URL について以下を実行:
+各 YouTube URL について:
 
-1. 字幕を取得:
+1. 字幕をマークダウンとして取得:
 ```bash
+# 通常（タイムスタンプリンクなし）
 uv run --script ${CLAUDE_PLUGIN_ROOT}/scripts/yt-transcript.py "<URL>"
+
+# ユーザーがタイムスタンプリンクを求めた場合のみ --timestamps を付ける
+uv run --script ${CLAUDE_PLUGIN_ROOT}/scripts/yt-transcript.py "<URL>" --timestamps
 ```
 
-2. 出力から JSON ファイルパスを確認し、Read で読み込む
+2. 出力に表示されるファイルパス（`/tmp/yt-transcript-VIDEO_ID.md`）を Read で読む
+   - 追加のデータ変換や Python スクリプトは不要
 
-3. 字幕データを分析し、以下の形式で要約を作成:
-
-### 出力フォーマット
+3. 字幕を読み、以下の形式で要約:
 
 ```
-## 動画タイトル・概要
+## 概要
 （動画の内容を1-2文で説明）
 
 ## 内容（時系列）
@@ -49,19 +52,16 @@ uv run --script ${CLAUDE_PLUGIN_ROOT}/scripts/yt-transcript.py "<URL>"
 ### セクション名
 [MM:SS](https://www.youtube.com/watch?v=VIDEO_ID&t=秒数) 内容の説明...
 
-### 次のセクション名
-[MM:SS](https://www.youtube.com/watch?v=VIDEO_ID&t=秒数) 内容の説明...
-
 ## まとめ
-（動画全体の要点を簡潔に）
+（要点を簡潔に）
 ```
 
 ## 重要なルール
 
-- タイムスタンプは必ず YouTube リンク形式にする: `[MM:SS](https://www.youtube.com/watch?v=VIDEO_ID&t=秒数)`
-  - 例: `[03:25](https://www.youtube.com/watch?v=abc123&t=205)`
-  - `t=` の値は秒数（整数）
+- `--timestamps` を付けた場合のみ、字幕ファイルのタイムスタンプリンクをそのまま使う
+- ユーザーが「タイムスタンプ付きで」等と明示しない限り `--timestamps` は付けない
 - 字幕は自動生成の場合、誤認識がある。文脈から正しい内容を推測すること
 - 主要なトピックの切り替わりごとにセクションを分ける
 - 長い動画（30分以上）でも重要なポイントを漏らさず要約する
 - 複数 URL の場合は動画ごとにセクション（`#`）で分ける
+- **余計なデータ加工スクリプトを書かない。字幕ファイルを読んで要約するだけ。**

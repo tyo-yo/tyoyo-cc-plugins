@@ -6,16 +6,14 @@
 # ]
 # ///
 
-"""YouTube 字幕取得スクリプト - 動画の字幕をJSON形式で出力"""
+"""YouTube 字幕取得スクリプト - タイムスタンプ付きマークダウンで出力"""
 
 import sys
-import json
 import re
 from youtube_transcript_api import YouTubeTranscriptApi
 
 
 def extract_video_id(url: str) -> str:
-    """YouTube URL から video ID を抽出"""
     patterns = [
         r"(?:v=|youtu\.be/)([a-zA-Z0-9_-]{11})",
         r"^([a-zA-Z0-9_-]{11})$",
@@ -27,44 +25,52 @@ def extract_video_id(url: str) -> str:
     raise ValueError(f"Could not extract video ID from: {url}")
 
 
+def format_timestamp(seconds: float) -> str:
+    s = int(seconds)
+    m, s = divmod(s, 60)
+    h, m = divmod(m, 60)
+    if h > 0:
+        return f"{h:02d}:{m:02d}:{s:02d}"
+    return f"{m:02d}:{s:02d}"
+
+
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: yt-transcript.py <youtube-url-or-id> [language]", file=sys.stderr)
+    args = [a for a in sys.argv[1:] if not a.startswith("-")]
+    flags = {a for a in sys.argv[1:] if a.startswith("-")}
+    timestamps = "--timestamps" in flags or "-t" in flags
+
+    if not args:
+        print("Usage: yt-transcript.py <youtube-url-or-id> [language] [--timestamps]", file=sys.stderr)
         sys.exit(1)
 
-    url = sys.argv[1]
-    preferred_langs = sys.argv[2].split(",") if len(sys.argv) > 2 else ["ja", "en"]
+    url = args[0]
+    preferred_langs = args[1].split(",") if len(args) > 1 else ["ja", "en"]
 
     video_id = extract_video_id(url)
     ytt = YouTubeTranscriptApi()
 
-    # 字幕取得
     transcript = ytt.fetch(video_id, languages=preferred_langs)
     entries = list(transcript)
 
     total_duration = max(e.start + e.duration for e in entries) if entries else 0
-    total_chars = sum(len(e.text) for e in entries)
 
-    result = {
-        "video_id": video_id,
-        "url": f"https://www.youtube.com/watch?v={video_id}",
-        "entry_count": len(entries),
-        "total_duration_sec": round(total_duration),
-        "total_chars": total_chars,
-        "entries": [
-            {"text": e.text, "start": e.start, "duration": e.duration}
-            for e in entries
-        ],
-    }
-
-    output_path = f"/tmp/yt-transcript-{video_id}.json"
+    output_path = f"/tmp/yt-transcript-{video_id}.md"
     with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(result, f, ensure_ascii=False, indent=2)
+        f.write(f"# Transcript: {video_id}\n\n")
+        f.write(f"URL: https://www.youtube.com/watch?v={video_id}\n")
+        f.write(f"Entries: {len(entries)} | Duration: {format_timestamp(total_duration)}\n\n")
+        f.write("---\n\n")
+        for e in entries:
+            ts = format_timestamp(e.start)
+            if timestamps:
+                t = int(e.start)
+                f.write(f"[{ts}](https://www.youtube.com/watch?v={video_id}&t={t}) {e.text}\n\n")
+            else:
+                f.write(f"{ts} {e.text}\n\n")
 
     print(f"video_id: {video_id}")
     print(f"entries: {len(entries)}")
-    print(f"duration: {round(total_duration)}s")
-    print(f"chars: {total_chars}")
+    print(f"duration: {format_timestamp(total_duration)}")
     print(f"saved: {output_path}")
 
 
