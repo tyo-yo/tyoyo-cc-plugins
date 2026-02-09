@@ -1,0 +1,11 @@
+{
+  "name": "youtube-research",
+  "version": "1.0.0",
+  "description": "YouTube動画のリサーチ・字幕取得・要約プラグイン",
+  "author": {
+    "name": "tyo-yo"
+  },
+  "repository": "https://github.com/tyoyo/tyoyo-cc-plugins",
+  "license": "MIT",
+  "keywords": ["youtube", "transcript", "research", "summary", "yt-dlp"]
+}

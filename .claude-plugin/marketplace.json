@@ -98,6 +98,23 @@
         "daemon",
         "trigger"
       ]
+    },
+    {
+      "name": "youtube-research",
+      "source": "./youtube-research",
+      "description": "YouTube動画のリサーチ・字幕取得・要約プラグイン（yt-dlp検索・youtube-transcript-api字幕取得）",
+      "version": "1.0.0",
+      "author": {
+        "name": "tyo-yo"
+      },
+      "license": "MIT",
+      "keywords": [
+        "youtube",
+        "transcript",
+        "research",
+        "summary",
+        "yt-dlp"
+      ]
     }
   ]
 }
