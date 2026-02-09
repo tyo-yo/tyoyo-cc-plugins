@@ -54,13 +54,8 @@ NTFY_SERVER = os.environ.get("NTFY_SERVER", "https://ntfy.sh")
 NTFY_TOPIC = os.environ.get("NTFY_TOPIC", "my-claude-tasks")
 ZELLIJ_SESSION = os.environ.get("ZELLIJ_SESSION", "main")
 CLAUDE_TIMEOUT = int(os.environ.get("CLAUDE_TIMEOUT", "600"))  # 10 min
-CLAUDE_SKIP_PERMISSIONS = os.environ.get("CLAUDE_SKIP_PERMISSIONS", "").lower() in (
-    "1", "true", "yes"
-)
-CLAUDE_ALLOWED_TOOLS = os.environ.get(
-    "CLAUDE_ALLOWED_TOOLS",
-    "Bash,Read,Write,Edit,Glob,Grep,WebFetch,WebSearch",
-)
+# Working directory for auto tasks (should have settings.json for sandbox)
+CLAUDE_WORK_DIR = Path(os.environ.get("CLAUDE_WORK_DIR", Path.cwd()))
 
 DATA_DIR = Path.home() / ".local/share/ntfy-claude"
 STATE_FILE = DATA_DIR / "last-timestamp"
@@ -532,26 +527,20 @@ class NtfyClaudeApp(App):
         self.call_from_thread(self._on_job_updated, job)
 
         try:
-            # Build command with permission settings
-            cmd = [
-                "claude", "-p", job.prompt,
-                "--output-format", "stream-json",
-                "--verbose",
-                "--max-turns", "10",
-            ]
-            if CLAUDE_SKIP_PERMISSIONS:
-                # Full auto mode (use in isolated environments only)
-                cmd.append("--dangerously-skip-permissions")
-            else:
-                # Safe auto mode: allow edits + specific tools
-                cmd.extend(["--permission-mode", "acceptEdits"])
-                cmd.extend(["--allowedTools", CLAUDE_ALLOWED_TOOLS])
-
+            # Run in sandboxed work directory with full auto permissions
+            # (settings.json in CLAUDE_WORK_DIR enables sandbox isolation)
             proc = subprocess.run(
-                cmd,
+                [
+                    "claude", "-p", job.prompt,
+                    "--output-format", "stream-json",
+                    "--verbose",
+                    "--max-turns", "10",
+                    "--dangerously-skip-permissions",
+                ],
                 capture_output=True,
                 text=True,
                 timeout=CLAUDE_TIMEOUT,
+                cwd=CLAUDE_WORK_DIR,
             )
 
             steps, result_event = parse_stream_json(proc.stdout)

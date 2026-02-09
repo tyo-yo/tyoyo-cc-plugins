@@ -51,7 +51,25 @@ NTFY_TOPIC="ntfy-claude-$(openssl rand -hex 8)" && echo "export NTFY_TOPIC=\"$NT
 
 > **重要**: トピック名は ntfy.sh 上で認証なしにアクセスできるため、ランダムな文字列をパスワード代わりに使う。トピック名を第三者や Claude に共有しないこと。
 
-### 1-2. デーモン起動コマンドの登録
+### 1-2. 作業ディレクトリの準備（auto タスク用）
+
+auto タスクはサンドボックス環境で実行される。専用の作業ディレクトリを用意し、サンドボックス設定を配置する。
+
+```bash
+# 作業ディレクトリを作成
+mkdir -p ~/claude-workspace
+cd ~/claude-workspace
+
+# サンドボックス設定をダウンロード
+curl -o settings.json https://raw.githubusercontent.com/tyo-yo/tyoyo-cc-plugins/main/ntfy-claude-runner/skills/ntfy-claude-runner/resources/settings.json
+
+# 環境変数に登録
+echo "export CLAUDE_WORK_DIR=\"$HOME/claude-workspace\"" >> ~/.zshrc && export CLAUDE_WORK_DIR="$HOME/claude-workspace" && echo "Done"
+```
+
+> **サンドボックスとは**: auto タスクは `--dangerously-skip-permissions`（全ツール自動許可）で実行されるが、`settings.json` のサンドボックス設定によりファイル操作が作業ディレクトリ内に制限される。
+
+### 1-3. デーモン起動コマンドの登録
 
 ```bash
 echo "alias ntfy-claude='uv run https://raw.githubusercontent.com/tyo-yo/tyoyo-cc-plugins/main/ntfy-claude-runner/skills/ntfy-claude-runner/resources/ntfy-claude-daemon.py'" >> ~/.zshrc && source <(echo "alias ntfy-claude='uv run https://raw.githubusercontent.com/tyo-yo/tyoyo-cc-plugins/main/ntfy-claude-runner/skills/ntfy-claude-runner/resources/ntfy-claude-daemon.py'") && echo "Done"
@@ -158,19 +176,16 @@ ntfy.sh はメッセージを12時間キャッシュする。スリープ復帰�
 CLAUDE_TIMEOUT=300 ntfy-claude   # 5分に変更
 ```
 
-### Claude の権限設定
+### サンドボックスが機能しない
 
-デフォルトでは安全な自動実行モード（`--permission-mode acceptEdits` + `--allowedTools`）で動作する。
+Linux/WSL2 では bubblewrap が必要:
 
 ```bash
-# 許可するツールをカスタマイズ
-CLAUDE_ALLOWED_TOOLS="Bash,Read,Edit" ntfy-claude
+# Ubuntu/Debian
+sudo apt-get install bubblewrap socat
 
-# 完全自動モード（隔離環境でのみ推奨）
-CLAUDE_SKIP_PERMISSIONS=1 ntfy-claude
+# Fedora
+sudo dnf install bubblewrap socat
 ```
 
-| 環境変数 | デフォルト | 説明 |
-|---------|-----------|------|
-| `CLAUDE_ALLOWED_TOOLS` | `Bash,Read,Write,Edit,Glob,Grep,WebFetch,WebSearch` | 自動許可するツール |
-| `CLAUDE_SKIP_PERMISSIONS` | (未設定) | `1` で全権限スキップ |
+macOS は Seatbelt を使用するため追加インストール不要。
