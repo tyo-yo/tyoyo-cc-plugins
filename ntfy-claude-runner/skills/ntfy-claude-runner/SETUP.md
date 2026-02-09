@@ -64,7 +64,7 @@ cd ~/claude-workspace
 curl -o settings.json https://raw.githubusercontent.com/tyo-yo/tyoyo-cc-plugins/main/ntfy-claude-runner/skills/ntfy-claude-runner/resources/settings.json
 
 # 環境変数に登録
-echo "export CLAUDE_WORK_DIR=\"$HOME/claude-workspace\"" >> ~/.zshrc && export CLAUDE_WORK_DIR="$HOME/claude-workspace" && echo "Done"
+echo "export NTFY_CLAUDE_DIR=\"$HOME/claude-workspace\"" >> ~/.zshrc && export NTFY_CLAUDE_DIR="$HOME/claude-workspace" && echo "Done"
 ```
 
 > **サンドボックスとは**: auto タスクは `--dangerously-skip-permissions`（全ツール自動許可）で実行されるが、`settings.json` のサンドボックス設定によりファイル操作が作業ディレクトリ内に制限される。

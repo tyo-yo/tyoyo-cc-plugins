@@ -55,7 +55,7 @@ NTFY_TOPIC = os.environ.get("NTFY_TOPIC", "my-claude-tasks")
 ZELLIJ_SESSION = os.environ.get("ZELLIJ_SESSION", "main")
 CLAUDE_TIMEOUT = int(os.environ.get("CLAUDE_TIMEOUT", "600"))  # 10 min
 # Working directory for auto tasks (should have settings.json for sandbox)
-CLAUDE_WORK_DIR = Path(os.environ.get("CLAUDE_WORK_DIR", Path.cwd()))
+NTFY_CLAUDE_DIR = Path(os.environ.get("NTFY_CLAUDE_DIR", Path.cwd()))
 
 DATA_DIR = Path.home() / ".local/share/ntfy-claude"
 STATE_FILE = DATA_DIR / "last-timestamp"
@@ -528,7 +528,7 @@ class NtfyClaudeApp(App):
 
         try:
             # Run in sandboxed work directory with full auto permissions
-            # (settings.json in CLAUDE_WORK_DIR enables sandbox isolation)
+            # (settings.json in NTFY_CLAUDE_DIR enables sandbox isolation)
             proc = subprocess.run(
                 [
                     "claude", "-p", job.prompt,
@@ -540,7 +540,7 @@ class NtfyClaudeApp(App):
                 capture_output=True,
                 text=True,
                 timeout=CLAUDE_TIMEOUT,
-                cwd=CLAUDE_WORK_DIR,
+                cwd=NTFY_CLAUDE_DIR,
             )
 
             steps, result_event = parse_stream_json(proc.stdout)
