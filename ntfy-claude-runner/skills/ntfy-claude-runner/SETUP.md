@@ -157,3 +157,20 @@ ntfy.sh はメッセージを12時間キャッシュする。スリープ復帰�
 ```bash
 CLAUDE_TIMEOUT=300 ntfy-claude   # 5分に変更
 ```
+
+### Claude の権限設定
+
+デフォルトでは安全な自動実行モード（`--permission-mode acceptEdits` + `--allowedTools`）で動作する。
+
+```bash
+# 許可するツールをカスタマイズ
+CLAUDE_ALLOWED_TOOLS="Bash,Read,Edit" ntfy-claude
+
+# 完全自動モード（隔離環境でのみ推奨）
+CLAUDE_SKIP_PERMISSIONS=1 ntfy-claude
+```
+
+| 環境変数 | デフォルト | 説明 |
+|---------|-----------|------|
+| `CLAUDE_ALLOWED_TOOLS` | `Bash,Read,Write,Edit,Glob,Grep,WebFetch,WebSearch` | 自動許可するツール |
+| `CLAUDE_SKIP_PERMISSIONS` | (未設定) | `1` で全権限スキップ |
