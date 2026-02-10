@@ -81,7 +81,7 @@ cc --plugin-dir ~/repos/tyoyo-cc-plugins/knowledge-pathfinder
 
 ### Skills
 
-- **create-docs-command**: Guides documentation reference command creation
+- **knowledge-pathfinder**: Guides documentation reference command creation
 
 ### Templates
 
