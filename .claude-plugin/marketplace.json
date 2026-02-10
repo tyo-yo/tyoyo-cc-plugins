@@ -149,6 +149,25 @@
         "timeline",
         "agent-browser"
       ]
+    },
+    {
+      "name": "knowledge-pathfinder",
+      "source": "./knowledge-pathfinder",
+      "description": "Create optimized documentation reference commands using modern standards (llms.txt, sitemap.xml) and category-specific strategies for 90-100% URL coverage without crawling services",
+      "version": "0.2.0",
+      "author": {
+        "name": "tyo-yo"
+      },
+      "license": "MIT",
+      "keywords": [
+        "documentation",
+        "indexing",
+        "knowledge",
+        "llm",
+        "llms-txt",
+        "sitemap",
+        "web-search"
+      ]
     }
   ]
 }
