@@ -168,6 +168,27 @@
         "sitemap",
         "web-search"
       ]
+    },
+    {
+      "name": "custom-code-review",
+      "source": "./custom-code-review",
+      "description": "Multi-perspective code review plugin with 39 specialized review angles - security, correctness, design, testing, and more. 5 review modes from quick to thorough with parallel agent execution",
+      "version": "1.0.0",
+      "author": {
+        "name": "tyo-yo"
+      },
+      "license": "MIT",
+      "keywords": [
+        "code-review",
+        "pr-review",
+        "security",
+        "quality",
+        "testing",
+        "multi-agent",
+        "perspective",
+        "design",
+        "architecture"
+      ]
     }
   ]
 }

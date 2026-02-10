@@ -1,0 +1,9 @@
+{
+  "name": "custom-code-review",
+  "version": "1.0.0",
+  "description": "Multi-perspective code review plugin with 39 specialized review angles",
+  "author": {
+    "name": "tyo-yo"
+  },
+  "license": "MIT"
+}
