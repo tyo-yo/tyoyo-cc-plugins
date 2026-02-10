@@ -532,6 +532,7 @@ class NtfyClaudeApp(App):
             proc = subprocess.run(
                 [
                     "claude", "-p", job.prompt,
+                    "--model", "sonnet",
                     "--output-format", "stream-json",
                     "--verbose",
                     "--max-turns", "100",
