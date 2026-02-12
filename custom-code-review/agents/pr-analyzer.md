@@ -23,7 +23,16 @@ Collect all relevant information about the current PR or uncommitted changes:
 
 You will receive:
 - A session ID for temporary file storage
+- Language for report (e.g., "ja", "en", "pt") - default: "ja"
 - Path to configuration file (if exists)
+
+## Output Language
+
+**IMPORTANT**: Write your entire report in the specified language.
+- If Language is "ja" (Japanese): Write all sections, descriptions, and summaries in Japanese
+- If Language is "en" (English): Write all sections, descriptions, and summaries in English
+- If Language is "pt" (Portuguese): Write all sections, descriptions, and summaries in Portuguese
+- Apply this to all text in the output file, including section headers and descriptions
 
 ## Process
 

@@ -37,7 +37,7 @@ cc plugins link /path/to/custom-code-review
 /custom-code-review:review light
 
 # 高速で包括的（10-15分）
-/custom-code-review:review standard-shallow
+/custom-code-review:review standard-fast
 
 # 徹底的なレビュー（25-30分）
 /custom-code-review:review thorough
@@ -49,9 +49,9 @@ cc plugins link /path/to/custom-code-review
 |--------|--------|--------------|---------|------|
 | **Light** | 3-5 | 3-5 | ~5-10分 | 軽微な変更、クイックチェック |
 | **Standard** | 7-10 | 7-10 | ~15-20分 | 通常のPR、機能開発 |
-| **Standard Shallow** | 7-10 | 3-4 | ~10-15分 | 高速かつ包括的 |
+| **Standard Fast** | 7-10 | 3-4 | ~10-15分 | 高速かつ包括的 |
 | **Thorough** | 15-20 | 15-20 | ~25-30分 | 重要な機能、セキュリティ |
-| **Thorough Shallow** | 15-20 | 5-7 | ~15-20分 | 包括的かつ効率的 |
+| **Thorough Fast** | 15-20 | 5-7 | ~15-20分 | 包括的かつ効率的 |
 
 ### レビュー観点カテゴリ
 
@@ -75,6 +75,7 @@ cc plugins link /path/to/custom-code-review
 ```markdown
 ---
 mode: standard  # デフォルトモード
+language: ja    # レポート言語（ja: 日本語, en: 英語, pt: ポルトガル語など）
 excluded_perspectives:
   - DOC01  # コメント品質チェックをスキップ
   - PERF02 # アクセシビリティをスキップ
@@ -83,7 +84,6 @@ max_parallel_agents: 7
 
 # Additional Instructions
 
-レビューコメントは日本語で書いてください。
 このプロジェクトではReact Hooksのルールを厳守してください。
 ```
 
@@ -91,6 +91,11 @@ max_parallel_agents: 7
 
 **YAML Frontmatter**:
 - `mode`: デフォルトのレビューモード
+- `language`: レポート出力言語（デフォルト: `ja`）
+  - `ja`: 日本語
+  - `en`: 英語
+  - `pt`: ポルトガル語
+  - その他の言語コードも指定可能
 - `excluded_perspectives`: 除外する観点ID（配列）
 - `max_parallel_agents`: 並列エージェント数の上限
 
@@ -144,7 +149,7 @@ max_parallel_agents: 7
 ## よくある質問
 
 ### Q: レビューに時間がかかりすぎる
-**A**: `standard-shallow` または `light` モードを使用してください。Shallowモードは複数の観点を1エージェントにまとめて高速化します。
+**A**: `standard-fast` または `light` モードを使用してください。Fastモードは複数の観点を1エージェントにまとめて高速化します。
 
 ### Q: 特定の観点だけをレビューしたい
 **A**: `.local.md`で不要な観点を`excluded_perspectives`に追加してください。
@@ -229,7 +234,7 @@ tyo-yo
 ### 1.0.0 (2026-02-11)
 - 初回リリース
 - 39の観点によるマルチパースペクティブレビュー
-- 5つのレビューモード（Light, Standard, Standard Shallow, Thorough, Thorough Shallow）
+- 5つのレビューモード（Light, Standard, Standard Fast, Thorough, Thorough Fast）
 - 偽陽性チェック機能
 - プロジェクト別カスタマイズ
 - 仕様設計支援スキル（perspective-guide）

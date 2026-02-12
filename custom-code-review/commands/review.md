@@ -8,7 +8,7 @@ allowed-tools: ["Bash", "Read", "Task", "AskUserQuestion"]
 
 Run a comprehensive, multi-perspective code review using specialized review agents.
 
-**Mode**: "$ARGUMENTS" (optional: light, standard, standard-shallow, thorough, thorough-shallow)
+**Mode**: "$ARGUMENTS" (optional: light, standard, standard-fast, thorough, thorough-fast)
 
 ## Workflow Overview
 
@@ -52,8 +52,13 @@ fi
 ```
 
 If file exists, read it using Read tool to extract:
-- YAML frontmatter: mode, excluded_perspectives, max_parallel_agents
+- YAML frontmatter: mode, excluded_perspectives, max_parallel_agents, language
 - Markdown body: additional_instructions
+
+**Default values if not specified**:
+- mode: "standard"
+- language: "ja" (Japanese)
+- max_parallel_agents: 7
 
 ### Step 1.4: Launch PR Analyzer
 
@@ -64,6 +69,7 @@ Use Task tool to launch `pr-analyzer` agent:
 Collect PR information for code review.
 
 Session ID: {SESSION_ID}
+Language: {language} (default: ja)
 
 Please:
 1. Create /tmp/claude-code-review-{SESSION_ID}/ directory
@@ -92,6 +98,71 @@ Priority order:
 
 Read `/tmp/claude-code-review-{SESSION_ID}/pr-summary.md` to understand scope.
 
+### Step 2.2a: Present Perspective Coverage for Each Mode
+
+Display to user which perspectives each mode will review:
+
+**Light Mode** (3 perspectives, ~5-10 min):
+- P01: AI Agent Instructions
+- C01: Bug Detection
+- S01: Basic Vulnerabilities
+
+**Standard Mode** (7 perspectives, ~15-20 min):
+- P01: AI Agent Instructions
+- C01: Bug Detection
+- C03: Edge Cases
+- S01: Basic Vulnerabilities
+- S03: False Positive Filter
+- T01: Test Coverage
+- Q01: Readability
+
+**Thorough Mode** (15 perspectives, ~25-30 min):
+All from Standard, plus:
+- P02: Pattern Alignment
+- C02: Functional Compliance
+- C04: Silent Failures
+- C05: Exception Safety
+- S02: Common Security Patterns
+- S04: Precedent-Based Security
+- S05: Adaptive Review Depth
+- T02: Test Quality
+- T03: Error Handling Quality
+- Q02: Complexity
+- Q03: Code Smells
+- Q04: Antipatterns
+- D01: Type Design
+- D03: API Design
+- DOC01: Comment Quality
+
+**Fast Modes**: Same perspectives as their non-Fast counterparts, but with multiple perspectives per agent for faster execution.
+
+Note to user: "If you want details on any perspective, just ask."
+
+### Step 2.2b: Analyze PR and Recommend Mode
+
+Based on PR summary, analyze:
+1. **Change scope**: Number of files, lines changed
+2. **Change type**: Bug fix, new feature, refactoring, security fix
+3. **Risk level**: Critical path changes, security-sensitive areas
+
+Recommend mode:
+- **Light**: Minor changes (< 100 lines), typo fixes, simple bug fixes, documentation updates
+- **Standard**: Normal PRs, feature development (100-500 lines), typical bug fixes
+- **Thorough**: Critical features, security changes, large refactors (> 500 lines), authentication/authorization changes
+
+Display recommendation to user in this format:
+
+```
+Based on this PR:
+- Changed files: {count}
+- Total changes: ~{lines} lines added/modified
+- Type: {Bug fix/Feature/Refactoring/Security fix/Documentation}
+
+**Recommended mode**: {Light/Standard/Thorough} ({brief reason why})
+
+Would you like to proceed with the recommended mode or choose a different one?
+```
+
 ### Step 2.3: Present Mode Options to User
 
 Use AskUserQuestion to let user select mode:
@@ -100,31 +171,31 @@ Use AskUserQuestion to let user select mode:
 
 **Options**:
 
-1. **Light** (Quick - 3-5 perspectives)
+1. **Light**
    - Label: "Light"
-   - Description: "Quick review of critical issues only (~5-10 min). Focuses on: Project Standards (P01), Bug Detection (C01), Basic Security (S01). Best for: Quick checks, minor changes."
+   - Description: "Quick review (3 perspectives, ~5-10 min). Best for minor changes."
 
-2. **Standard** (Recommended - 7-10 perspectives)
+2. **Standard**
    - Label: "Standard (Recommended)"
-   - Description: "Balanced comprehensive review (~15-20 min). Covers: All Tier 1 + key Tier 2 perspectives. Best for: Most PRs, feature development."
+   - Description: "Balanced review (7 perspectives, ~15-20 min). Best for most PRs."
 
-3. **Standard Shallow** (Fast comprehensive - 7-10 perspectives, 3-4 agents)
-   - Label: "Standard Shallow"
-   - Description: "Same coverage as Standard but faster (~10-15 min). Each agent reviews multiple perspectives. Trade-off: Slightly less depth per perspective."
+3. **Standard Fast**
+   - Label: "Standard Fast"
+   - Description: "Same as Standard but faster (7 perspectives, 3-4 agents, ~10-15 min)."
 
-4. **Thorough** (Comprehensive - 15-20 perspectives)
+4. **Thorough**
    - Label: "Thorough"
-   - Description: "Deep review of all major perspectives (~25-30 min). Covers: All Tier 1 + Tier 2. Best for: Critical features, security-sensitive code."
+   - Description: "Deep review (15 perspectives, ~25-30 min). Best for critical features."
 
-5. **Thorough Shallow** (Comprehensive & Fast - 15-20 perspectives, 5-7 agents)
-   - Label: "Thorough Shallow"
-   - Description: "Full coverage with good speed (~15-20 min). Best for: Large PRs needing comprehensive but time-efficient review."
+5. **Thorough Fast**
+   - Label: "Thorough Fast"
+   - Description: "Same as Thorough but faster (15 perspectives, 5-7 agents, ~15-20 min)."
 
 ### Step 2.4: Process Mode Selection
 
 Based on selected mode, determine:
 - **Perspectives to review** (list of IDs)
-- **Agent parallelization** (deep: 1 perspective per agent, shallow: multiple per agent)
+- **Agent parallelization** (deep: 1 perspective per agent, fast: multiple per agent)
 - **Expected time**
 
 ---
@@ -153,7 +224,7 @@ Based on selected mode, determine:
 
 **Agents**: 7 agents (1 perspective each)
 
-#### Standard Shallow Mode
+#### Standard Fast Mode
 **Perspectives** (same as Standard: 7-10)
 
 **Agents**: 3-4 agents (2-3 perspectives each):
@@ -174,7 +245,7 @@ Based on selected mode, determine:
 
 **Agents**: 15-20 agents (1 perspective each)
 
-#### Thorough Shallow Mode
+#### Thorough Fast Mode
 **Perspectives** (same as Thorough: 15-20)
 
 **Agents**: 5-7 agents (3-4 perspectives each):
@@ -214,6 +285,7 @@ For each agent, use Task tool:
 Review code against perspective {PERSPECTIVE_ID}.
 
 Session ID: {SESSION_ID}
+Language: {language} (default: ja)
 
 Inputs:
 1. PR Summary: /tmp/claude-code-review-{SESSION_ID}/pr-summary.md
@@ -230,11 +302,12 @@ Please:
 Agent type: perspective-reviewer
 ```
 
-**Prompt Template** (Shallow Mode - multiple perspectives):
+**Prompt Template** (Fast Mode - multiple perspectives):
 ```
 Review code against perspectives {ID1}, {ID2}, {ID3}.
 
 Session ID: {SESSION_ID}
+Language: {language} (default: ja)
 
 Inputs:
 1. PR Summary: /tmp/claude-code-review-{SESSION_ID}/pr-summary.md
@@ -250,8 +323,6 @@ Please:
 4. Assign confidence scores (0-100)
 5. Report only issues with confidence ≥ 80
 6. Write to /tmp/claude-code-review-{SESSION_ID}/reviews/perspective-{ID1}-{ID2}-{ID3}.md
-
-Note: This is Shallow mode - review all perspectives but be efficient with time.
 
 Agent type: perspective-reviewer
 ```
@@ -273,6 +344,7 @@ Use Task tool to launch `consolidator` agent:
 Consolidate review findings from multiple perspectives.
 
 Session ID: {SESSION_ID}
+Language: {language} (default: ja)
 
 Please:
 1. Read all files in /tmp/claude-code-review-{SESSION_ID}/reviews/perspective-*.md
@@ -290,31 +362,85 @@ Agent type: consolidator
 
 ## Phase 6: False Positive Verification
 
-### Step 6.1: Launch Verifier
+### Step 6.1: Read Consolidated Report and Analyze
 
-Use Task tool to launch `verifier` agent:
+Read `/tmp/claude-code-review-{SESSION_ID}/consolidated.md` to:
+1. Count total issues
+2. Extract issues with confidence 80-90 (need verification)
+3. Extract Critical issues 91-100 (auto-verified)
 
-**Prompt**:
+### Step 6.2: Partition Issues for Parallel Verification
+
+If there are confidence 80-90 issues:
+
+**Determine parallelization**:
+- 1-3 issues: 1 verifier
+- 4-7 issues: 2-3 verifiers
+- 8-14 issues: 4-5 verifiers
+- 15+ issues: 7 verifiers (max)
+
+**Partition strategy**:
+Divide issues evenly among verifiers. Example with 20 issues and 7 verifiers:
+- Verifier 1: Issues 1-3
+- Verifier 2: Issues 4-6
+- Verifier 3: Issues 7-9
+- Verifier 4: Issues 10-12
+- Verifier 5: Issues 13-15
+- Verifier 6: Issues 16-18
+- Verifier 7: Issues 19-20
+
+### Step 6.3: Launch Verifiers in Parallel
+
+**Important**: Launch ALL verifiers in a SINGLE message (parallel execution).
+
+For each verifier, use Task tool:
+
+**Prompt Template**:
 ```
 Verify review findings to reduce false positives.
 
 Session ID: {SESSION_ID}
+Language: {language} (default: ja)
+Assigned Issues: {ISSUE_NUMBERS} (e.g., "1-3" or "4, 7, 9")
 
 Please:
 1. Read /tmp/claude-code-review-{SESSION_ID}/consolidated.md
-2. For issues with confidence 80-90:
+2. Extract your assigned issues (by number/title)
+3. For each assigned issue with confidence 80-90:
    - Deep analysis of code context
    - Check if handled elsewhere
+   - Use WebSearch/WebFetch for external validation when needed
+   - Consult documentation and best practices
+   - Test code if possible
    - Verify it's a real issue
-3. Classify as:
+4. Classify each as:
    - ✅ Verified (real issue)
    - ⚠️ Needs User Verification (uncertain)
    - ❌ False Positive (not an issue)
-4. Keep all Critical issues (91-100) as verified
-5. Write to /tmp/claude-code-review-{SESSION_ID}/verified.md
+5. Write results to /tmp/claude-code-review-{SESSION_ID}/verifier-{N}.md
+
+Use all available tools for thorough verification:
+- WebSearch for known issues, best practices
+- WebFetch for official documentation
+- Bash for testing code snippets
+- Skills for domain-specific knowledge
 
 Agent type: verifier
 ```
+
+### Step 6.4: Consolidate Verification Results
+
+After all verifiers complete:
+
+1. Read all `/tmp/claude-code-review-{SESSION_ID}/verifier-*.md` files
+2. Combine verification results
+3. Add Critical issues (91-100) as auto-verified
+4. Sort by category:
+   - Critical Issues (91-100) - all verified
+   - Verified Issues (80-90) - confirmed real
+   - Needs User Verification (80-90) - uncertain
+   - False Positives (80-90) - confirmed not issues
+5. Write final report to `/tmp/claude-code-review-{SESSION_ID}/verified.md`
 
 ---
 
@@ -440,7 +566,8 @@ Users can create `.claude/custom-code-review.local.md`:
 
 ```markdown
 ---
-mode: standard  # light, standard, standard-shallow, thorough, thorough-shallow
+mode: standard  # light, standard, standard-fast, thorough, thorough-fast
+language: ja    # ja (Japanese), en (English), pt (Portuguese), etc.
 excluded_perspectives:
   - DOC01  # Example: Skip comment quality checks
   - PERF02 # Example: Skip accessibility checks
@@ -449,7 +576,7 @@ max_parallel_agents: 7
 
 # Additional Instructions
 
-{Any custom instructions for reviewers, e.g., "Review in Portuguese"}
+{Any custom instructions for reviewers}
 ```
 
 ---
@@ -518,7 +645,7 @@ max_parallel_agents: 7
 
 **Fast comprehensive review**:
 ```
-/custom-code-review:review standard-shallow
+/custom-code-review:review standard-fast
 ```
 
 **Deep review**:
@@ -528,7 +655,7 @@ max_parallel_agents: 7
 
 **Very comprehensive review**:
 ```
-/custom-code-review:review thorough-shallow
+/custom-code-review:review thorough-fast
 ```
 
 ---
