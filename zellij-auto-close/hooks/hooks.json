@@ -1,0 +1,17 @@
+{
+  "description": "Closes the Zellij pane when a Claude Code session ends",
+  "hooks": {
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/close-pane.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
