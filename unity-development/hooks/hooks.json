@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "matcher": "Edit|Write",
+        "command": "${CLAUDE_PLUGIN_ROOT}/scripts/pre-destructive-check.ts"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "type": "command",
+        "matcher": "Write|Edit",
+        "command": "${CLAUDE_PLUGIN_ROOT}/scripts/validate-script.ts"
+      }
+    ]
+  }
+}
