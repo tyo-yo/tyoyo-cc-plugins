@@ -1,192 +1,117 @@
 ---
 name: unity-setup-mcp
-description: Setup Unity MCP server and connect to Claude Code
-argument-hint: "[project-path]"
+description: Check prerequisites and configure environment for Unity MCP
+argument-hint: "[unity-project-path]"
 allowed-tools: Bash, Read, Write
 ---
 
-# Unity MCP Setup Command
+# Unity MCP Setup Verification
 
-Setup Unity MCP server and configure Claude Code integration.
+Verify prerequisites and help configure environment variables for Unity MCP integration.
+
+**Note**: Unity MCP is automatically configured via this plugin's `.mcp.json`. This command helps with environment setup and verification.
 
 ## Instructions
 
-Execute the following steps to set up Unity MCP:
+### 1. Check Prerequisites
 
-### 1. Detect Operating System
-
-Determine the user's OS (macOS, Linux, or Windows) to provide appropriate installation commands.
-
-### 2. Install Prerequisites
-
-**macOS/Linux**:
-- Check if `uv` package manager is installed: `uv --version`
-- If not installed, install via: `curl -LsSf https://astral.sh/uv/install.sh | sh`
-- Verify Unity 6.2+ is installed: Check `/Applications/Unity/Hub/Editor/` or ask user
-
-**Windows**:
-- Check if `uv.exe` is installed: `uv --version`
-- If not installed, install via WinGet: `winget install --id=astral-sh.uv -e`
-- Recommended path: `%LOCALAPPDATA%\Microsoft\WinGet\Links\uv.exe`
-- Verify Unity 6.2+ is installed: Check `C:\Program Files\Unity\Hub\Editor\` or ask user
-
-### 3. Install Unity MCP Package
-
-Explain to user they need to add Unity MCP package to their Unity project via one of:
-
-**Option A: OpenUPM (Recommended)**:
+**Check uv installation**:
 ```bash
-# Add via Package Manager > Add package by name
-# Package name: com.coplaydev.unity-mcp
+uv --version
 ```
 
-**Option B: Git URL**:
+If not installed:
+- **macOS/Linux**: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+- **Windows**: `winget install --id=astral-sh.uv -e`
+
+### 2. Set Unity Project Path
+
+Unity MCP requires `UNITY_PROJECT_PATH` environment variable.
+
+**If user provided project-path argument**:
+- Use that path
+- Validate it's a Unity project (check for `Assets/` and `ProjectSettings/`)
+
+**If no argument**:
+- Check if current directory is a Unity project
+- Ask user for Unity project path
+
+**Set environment variable**:
+
+**macOS/Linux (bash/zsh)**:
 ```bash
-# Add via Package Manager > Add package from git URL
-# URL: https://github.com/CoplayDev/unity-mcp.git?path=/Packages/com.coplaydev.unity-mcp
+# Add to ~/.bashrc or ~/.zshrc
+echo 'export UNITY_PROJECT_PATH="/path/to/unity/project"' >> ~/.zshrc
+source ~/.zshrc
 ```
 
-Provide clear instructions for Unity Editor's Package Manager UI.
-
-### 4. Configure MCP Server in Claude Code
-
-**For macOS/Linux (HTTP transport - recommended)**:
-
-Ask user to confirm Unity Editor is running, then configure MCP:
-
-```bash
-# Check if Unity MCP HTTP endpoint is accessible
-curl -s http://localhost:8080/mcp > /dev/null 2>&1 && echo "Unity MCP HTTP server is running" || echo "Unity MCP HTTP server is not accessible. Please ensure Unity Editor is running with MCP plugin installed."
-
-# Add Unity MCP to Claude Code configuration
-# User needs to manually edit ~/.claude.json or use Claude Desktop settings
+**Windows (PowerShell)**:
+```powershell
+# Set user environment variable
+[Environment]::SetEnvironmentVariable("UNITY_PROJECT_PATH", "C:\path\to\unity\project", "User")
 ```
 
-Provide the JSON configuration for user to add:
+Inform user they may need to restart terminal/Claude Code for changes to take effect.
 
-```json
-{
-  "mcpServers": {
-    "unity-mcp": {
-      "url": "http://localhost:8080/mcp",
-      "timeout": 720000
-    }
-  }
-}
-```
+### 3. Verify MCP Server Status
 
-**For macOS/Linux (Stdio transport - legacy)**:
-
-```json
-{
-  "mcpServers": {
-    "unity-mcp": {
-      "command": "uvx",
-      "args": [
-        "--from",
-        "mcpforunityserver",
-        "mcp-for-unity",
-        "--transport",
-        "stdio"
-      ],
-      "env": {
-        "MCP_TOOL_TIMEOUT": "720000"
-      }
-    }
-  }
-}
-```
-
-**For Windows (Stdio transport)**:
-
-```json
-{
-  "mcpServers": {
-    "unity-mcp": {
-      "command": "C:\\Users\\YourName\\AppData\\Local\\Microsoft\\WinGet\\Links\\uv.exe",
-      "args": [
-        "--from",
-        "mcpforunityserver",
-        "mcp-for-unity",
-        "--transport",
-        "stdio"
-      ],
-      "env": {
-        "MCP_TOOL_TIMEOUT": "720000",
-        "PYTHONUTF8": "1"
-      }
-    }
-  }
-}
-```
-
-Note: Replace `YourName` with actual Windows username.
-
-### 5. Verify Connection
-
-After configuration, verify MCP connection:
+Check if Unity MCP is available:
 
 ```bash
-# List configured MCP servers
-claude mcp list
-
-# Check Unity-MCP is in the list and connected
-# If not connected, restart Claude Code or check Unity Editor status
+# This command shows all configured MCP servers
+# Unity MCP should appear in the list automatically due to .mcp.json
 ```
 
-Test basic MCP operation:
+Run `/mcp` slash command to verify Unity MCP server is listed.
 
+### 4. Install Unity MCP Package (Optional)
+
+If user wants to use Unity MCP's advanced features, guide them to install the Unity package:
+
+**Option A: Package Manager UI**:
+1. Open Unity Editor
+2. Window > Package Manager
+3. Click "+" > Add package from git URL
+4. Enter: `https://github.com/CoplayDev/unity-mcp.git?path=/Packages/com.coplaydev.unity-mcp`
+
+**Option B: OpenUPM**:
 ```bash
-# This should work if MCP is properly configured
-# User can try: "Get current Unity scene information"
-# This will use manage_scene tool internally
+# If user has OpenUPM CLI installed
+openupm add com.coplaydev.unity-mcp
 ```
 
-### 6. Provide Setup Completion Summary
+Note: Unity package is optional for basic MCP functionality via uvx.
 
-Display a completion message with:
+### 5. Verify Setup
 
-1. Confirmation of installed components
-2. MCP server status (connected/not connected)
-3. Next steps: "Try creating a GameObject with: 'Create a Cube in the current Unity scene'"
-4. Troubleshooting link if connection failed
+Confirm everything is ready:
 
-## Error Handling
+1. ✅ `uv` is installed
+2. ✅ `UNITY_PROJECT_PATH` environment variable is set
+3. ✅ Unity MCP appears in `/mcp` output
+4. ✅ (Optional) Unity MCP package installed in Unity project
 
-**If uv installation fails**:
-- Provide alternative installation methods (Homebrew, manual download)
-- Link to official uv documentation
+Suggest user try: "Get information about the current Unity scene"
 
-**If Unity MCP package installation fails**:
-- Verify Unity 6.2+ is installed
-- Check Unity Package Manager logs
-- Suggest manual installation via .unitypackage file
+## Troubleshooting
 
-**If MCP connection fails**:
-- Verify Unity Editor is running
-- Check if MCP HTTP endpoint is accessible (http://localhost:8080/mcp)
-- Review Unity console for MCP plugin errors
-- Suggest restarting Unity Editor
+**"unity-mcp not found in /mcp output"**:
+- Restart Claude Code to reload plugin configuration
+- Check `.mcp.json` exists in plugin directory
+- Verify `uv` is installed and in PATH
 
-**If path/encoding issues on Windows**:
-- Ensure PYTHONUTF8=1 is set
-- Verify uv.exe path is correct
-- Check for spaces in project path (recommend moving project if needed)
+**"UNITY_PROJECT_PATH not set"**:
+- Environment variable must be set before starting Claude Code
+- Restart terminal/Claude Code after setting variable
+- Verify with: `echo $UNITY_PROJECT_PATH` (bash/zsh) or `$env:UNITY_PROJECT_PATH` (PowerShell)
+
+**Windows UTF-8 encoding issues**:
+- Ensure PYTHONUTF8=1 is set (automatically included in .mcp.json)
+- Avoid project paths with non-ASCII characters
 
 ## Success Criteria
 
-Setup is successful when:
-
-1. `uv` is installed and accessible
-2. Unity MCP package is added to Unity project
-3. Unity Editor is running with MCP plugin active
-4. `claude mcp list` shows Unity-MCP as connected
-5. Basic MCP operation (e.g., get_scene_info) works
-
-## Important Notes
-
-- HTTP transport is recommended over Stdio for better performance and reliability
-- Stdio transport may be deprecated in future versions
-- Timeout of 720000ms (12 minutes) is recommended for large projects
-- Windows users must set PYTHONUTF8=1 for proper encoding
-- Project paths with spaces may cause issues on some platforms
+Setup is complete when:
+1. `/mcp` command shows `unity-mcp` server
+2. `UNITY_PROJECT_PATH` environment variable is set correctly
+3. User can interact with Unity via Claude Code
