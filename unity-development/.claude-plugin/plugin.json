@@ -1,6 +1,6 @@
 {
   "name": "unity-development",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Unity開発をClaude Codeで効率化。MCP統合、AI機能活用、スクリプト生成を支援",
   "author": {
     "name": "tyo-yo"
