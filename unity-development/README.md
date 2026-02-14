@@ -23,7 +23,19 @@ Unity開発をClaude Codeで効率化するプラグイン。Unity MCP統合、A
 - Claude Code CLI
 - [uv](https://github.com/astral-sh/uv) パッケージマネージャー
 
-### ステップ1: プラグインのインストール
+### クイックスタート
+
+**ステップ1: uvのインストール**
+
+```bash
+# macOS/Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Windows
+winget install --id=astral-sh.uv -e
+```
+
+**ステップ2: プラグインのインストール**
 
 ```bash
 # プラグインをインストール
@@ -33,85 +45,52 @@ claude plugin add tyoyo-cc-plugins/unity-development
 claude plugin add /path/to/tyoyo-cc-plugins/unity-development
 ```
 
-### ステップ2: Unity MCPのセットアップ
+**ステップ3: 環境変数の設定**
 
-プラグインインストール後、以下のコマンドでUnity MCPをセットアップ:
-
-```bash
-# セットアップコマンドを実行
-/unity-development:unity-setup-mcp
-```
-
-または、手動セットアップ:
-
-#### macOS/Linux (HTTP transport - 推奨)
-
-1. **uvのインストール**:
-   ```bash
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   ```
-
-2. **Unity MCPパッケージをUnityプロジェクトに追加**:
-   - Unity Editor > Package Manager > Add package by name
-   - パッケージ名: `com.coplaydev.unity-mcp`
-
-3. **Claude Code設定** (`~/.claude.json`):
-   ```json
-   {
-     "mcpServers": {
-       "unity-mcp": {
-         "url": "http://localhost:8080/mcp",
-         "timeout": 720000
-       }
-     }
-   }
-   ```
-
-#### Windows (Stdio transport)
-
-1. **uvのインストール**:
-   ```powershell
-   winget install --id=astral-sh.uv -e
-   ```
-
-2. **Unity MCPパッケージをUnityプロジェクトに追加** (macOSと同じ)
-
-3. **Claude Code設定** (`~/.claude.json`):
-   ```json
-   {
-     "mcpServers": {
-       "unity-mcp": {
-         "command": "C:\\Users\\YourName\\AppData\\Local\\Microsoft\\WinGet\\Links\\uv.exe",
-         "args": [
-           "--from",
-           "mcpforunityserver",
-           "mcp-for-unity",
-           "--transport",
-           "stdio"
-         ],
-         "env": {
-           "MCP_TOOL_TIMEOUT": "720000",
-           "PYTHONUTF8": "1"
-         }
-       }
-     }
-   }
-   ```
-
-### ステップ3: 接続確認
+Unity MCPにプロジェクトパスを教えるため、環境変数を設定:
 
 ```bash
-# MCP接続状態を確認
-claude mcp list
+# macOS/Linux (bash/zsh)
+echo 'export UNITY_PROJECT_PATH="/path/to/your/unity/project"' >> ~/.zshrc
+source ~/.zshrc
 
-# Unity-MCPが表示されればOK
+# Windows (PowerShell)
+[Environment]::SetEnvironmentVariable("UNITY_PROJECT_PATH", "C:\path\to\your\unity\project", "User")
 ```
 
-Unity Editorを起動した状態で、Claude Codeから以下を試してみましょう:
+**ステップ4: 確認**
+
+Claude Codeを再起動して、Unity MCPが自動的に設定されていることを確認:
+
+```bash
+/mcp
+```
+
+`unity-mcp` がリストに表示されればOK！
+
+**ステップ5: 動作確認**
+
+Unity Editorを起動した状態で、Claude Codeから試してみましょう:
 
 ```
 Unityで新しいシーンを作成して、Cubeを配置してください
 ```
+
+### 重要な注意点
+
+- **Unity MCPは自動設定**: プラグインの `.mcp.json` により、MCP サーバーは自動的に設定されます
+- **環境変数は必須**: `UNITY_PROJECT_PATH` を設定後、Claude Codeを再起動してください
+- **Windowsユーザー**: UTF-8エンコーディングは自動的に有効化されます (`PYTHONUTF8=1`)
+
+### セットアップヘルプ
+
+セットアップで困ったときは:
+
+```bash
+/unity-development:unity-setup-mcp [your-unity-project-path]
+```
+
+このコマンドで前提条件の確認と環境変数設定をサポートします。
 
 ## 使い方
 
