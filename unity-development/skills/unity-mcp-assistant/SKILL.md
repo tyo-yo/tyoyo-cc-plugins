@@ -21,21 +21,25 @@ Unity MCPを使ったUnity Editor操作の専門スキル。Claude CodeからUni
 
 ## Prerequisites Check
 
+**Important**: Unity MCP is automatically configured via this plugin's `.mcp.json`. No manual MCP setup is required.
+
 Before starting Unity operations, verify:
 
 1. **Unity MCP Server Status**
-   - Run `claude mcp list` to check if Unity-MCP is connected
-   - Ensure Unity Editor is running with the MCP plugin installed
-   - Verify MCP connection is active (HTTP or Stdio transport)
+   - Unity MCP is automatically added when this plugin is installed
+   - Check status: `/mcp` command should show `unity-mcp` server
+   - Ensure `uv` package manager is installed on the system
+   - Verify `UNITY_PROJECT_PATH` environment variable is set
 
 2. **Unity Project State**
-   - Confirm current Unity project path
-   - Check if project is open in Unity Editor
+   - Confirm Unity project path matches `UNITY_PROJECT_PATH` environment variable
+   - Check if project is open in Unity Editor (optional for basic operations)
    - Verify no ongoing Play mode or build process
 
 3. **MCP Tools Availability**
-   - Confirm access to core tools: manage_scene, manage_gameobject, create_script, manage_asset
-   - Check batch_execute availability for performance optimization
+   - Unity MCP tools are available via `uvx unity-mcp` command
+   - No Unity Editor plugin installation required for basic operations
+   - Advanced features may require Unity package installation
 
 ## Core Workflows
 
