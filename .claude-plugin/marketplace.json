@@ -202,6 +202,17 @@
       "keywords": ["zellij", "session-end", "auto-close", "pane"]
     },
     {
+      "name": "paragraph-writing",
+      "source": "./paragraph-writing",
+      "description": "パラグラフライティングのベストプラクティス - 構造化された文書作成ガイドライン",
+      "version": "1.0.0",
+      "author": {
+        "name": "tyo-yo"
+      },
+      "license": "MIT",
+      "keywords": ["writing", "paragraph", "documentation", "markdown", "japanese"]
+    },
+    {
       "name": "unity-development",
       "source": "./unity-development",
       "description": "Unity開発をClaude Codeで効率化。MCP統合、AI機能活用、スクリプト生成を支援",
