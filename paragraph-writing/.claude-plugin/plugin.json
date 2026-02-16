@@ -1,0 +1,11 @@
+{
+  "name": "paragraph-writing",
+  "version": "1.0.0",
+  "description": "パラグラフライティングのベストプラクティス - 構造化された文書作成ガイドライン",
+  "author": {
+    "name": "tyo-yo"
+  },
+  "repository": "https://github.com/tyoyo/tyoyo-cc-plugins",
+  "license": "MIT",
+  "keywords": ["writing", "paragraph", "documentation", "markdown", "japanese"]
+}
