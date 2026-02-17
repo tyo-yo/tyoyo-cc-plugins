@@ -235,7 +235,7 @@
       "name": "download-deepwiki",
       "source": "./download-deepwiki",
       "description": "Download DeepWiki content via mcpc and save as hierarchical markdown under .kiro/deepwiki/",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": {
         "name": "tyo-yo"
       },
