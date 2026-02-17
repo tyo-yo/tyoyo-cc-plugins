@@ -1,0 +1,11 @@
+{
+  "name": "download-deepwiki",
+  "version": "1.0.0",
+  "description": "Download DeepWiki content via mcpc and save as hierarchical markdown under .kiro/deepwiki/",
+  "author": {
+    "name": "tyo-yo"
+  },
+  "repository": "https://github.com/tyoyo/tyoyo-cc-plugins",
+  "license": "MIT",
+  "keywords": ["deepwiki", "mcpc", "documentation", "wiki", "markdown", "kiro"]
+}
