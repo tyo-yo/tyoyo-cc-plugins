@@ -230,6 +230,17 @@
         "scene-generation",
         "automation"
       ]
+    },
+    {
+      "name": "download-deepwiki",
+      "source": "./download-deepwiki",
+      "description": "Download DeepWiki content via mcpc and save as hierarchical markdown under .kiro/deepwiki/",
+      "version": "1.0.0",
+      "author": {
+        "name": "tyo-yo"
+      },
+      "license": "MIT",
+      "keywords": ["deepwiki", "mcpc", "documentation", "wiki", "markdown", "kiro"]
     }
   ]
 }
