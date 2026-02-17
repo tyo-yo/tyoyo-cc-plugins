@@ -194,7 +194,7 @@
       "name": "zellij-auto-close",
       "source": "./zellij-auto-close",
       "description": "Automatically closes the Zellij pane when a Claude Code session ends",
-      "version": "1.0.1",
+      "version": "1.0.0",
       "author": {
         "name": "tyo-yo"
       },

@@ -1,6 +1,6 @@
 {
   "name": "zellij-auto-close",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Automatically closes the Zellij pane when a Claude Code session ends",
   "author": { "name": "tyo-yo" },
   "repository": "https://github.com/tyoyo/tyoyo-cc-plugins",
