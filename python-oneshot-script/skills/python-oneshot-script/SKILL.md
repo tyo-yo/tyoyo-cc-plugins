@@ -91,8 +91,8 @@ chmod +x script.py && ./script.py
 # /// script
 # requires-python = ">=3.12"
 # dependencies = [
-#   "typer>=0.20",
-#   "loguru>=0.7",
+#   "typer",
+#   "loguru",
 # ]
 # ///
 
