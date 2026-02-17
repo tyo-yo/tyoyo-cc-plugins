@@ -68,6 +68,8 @@ chmod +x script.py && ./script.py
 | JSON フィルタ・変換 | `jq` | jq 記法でクエリ・変換 |
 | SQL でデータ集計 | `duckdb` | CSV/JSON/Parquet をサーバー不要で |
 
+バージョン指定なし（`"typer"` のみ）で uv が最新を取得する。再現性が必要な場合のみ `uv lock --script` でロックする。
+
 各ライブラリの使い方は `references/libraries.md` を参照。
 
 ---
