@@ -29,8 +29,11 @@ app = typer.Typer()
 
 def mcpc_call(tool: str, args: dict, config: Path, server: str) -> str:
     mcpc = local["mcpc"]
-    output = mcpc["--config", str(config), server, "tools-call", tool, json.dumps(args), "--json"]()
-    data = json.loads(output)
+    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tmp:
+        tmp_path = Path(tmp.name)
+    (mcpc["--config", str(config), server, "tools-call", tool, json.dumps(args), "--json"] > str(tmp_path))()
+    data = json.loads(tmp_path.read_text(encoding="utf-8"))
+    tmp_path.unlink(missing_ok=True)
     return data["content"][0]["text"]
 
 
