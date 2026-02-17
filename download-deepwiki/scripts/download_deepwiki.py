@@ -4,20 +4,20 @@
 # dependencies = [
 #   "typer",
 #   "loguru",
+#   "plumbum",
 # ]
 # ///
 
 import json
 import re
 import shutil
-import subprocess
 import sys
-import tempfile
 from pathlib import Path
 from typing import Annotated
 
 import typer
 from loguru import logger
+from plumbum import local
 
 DEFAULT_OUTPUT_DIR = Path(".kiro/deepwiki")
 DEFAULT_MCP_CONFIG = Path(".mcp.json")
