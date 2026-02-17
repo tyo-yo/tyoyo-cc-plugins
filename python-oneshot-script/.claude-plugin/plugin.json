@@ -1,6 +1,6 @@
 {
   "name": "python-oneshot-script",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "PEP 723インラインメタデータを使ったPython単発スクリプトの書き方ガイドライン",
   "author": {
     "name": "tyoyo"
