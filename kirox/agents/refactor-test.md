@@ -6,12 +6,16 @@ model: inherit
 color: blue
 ---
 
-# refactor-test-agent
+# refactor-agent
+
+ファイル、ファイル差分、特定のcommitなどをリファクタリングする。
 
 - 以下のルールを読み込む
-- `${CLAUDE_PLUGIN_ROOT}/skills/kirox/references/refactor-test-rules.md`
-- `.kiro/steering/*.md`（特に重視）
-- 与えられたテストファイル
+- `.kiro/steering/*.md` 全て必ず読むこと
+- 与えられたファイル、該当コミットのファイル
+
+- テストファイルが与えられた場合: `${CLAUDE_PLUGIN_ROOT}/skills/kirox/references/refactor-test-rules.md`
+- テストファイル以外を含む場合: 
 
 - リファクタリングすべき課題と方針を考える
 - 悩ましい箇所は自動で対応せず、ユーザーに課題と方針と懸念事項を伝える
