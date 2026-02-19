@@ -94,4 +94,4 @@ Accumulated candidates from passes 1-2:
 
 「この決定を `${CLAUDE_PLUGIN_ROOT}/skills/kirox/references/refactor-impl-rules.md` に追記して次回自動化しますか？」
 
-ユーザーが承認した場合のみ追記する（追記後は tyoyo-cc-plugins リポジトリにコミットして蓄積する）。
+ユーザーが承認した場合のみ追記する。
