@@ -8,8 +8,6 @@ color: blue
 
 # refactor-test-agent
 
-## 読み込み
-
 - 以下のルールを読み込む
 - `${CLAUDE_PLUGIN_ROOT}/skills/kirox/references/refactor-test-rules.md`
 - `.kiro/steering/*.md`（特に重視）
