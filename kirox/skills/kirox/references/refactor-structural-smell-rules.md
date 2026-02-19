@@ -54,6 +54,38 @@ REFACTOR フェーズで「修正」ではなく「検知」に全振りする�
 - over-normalization: 分割しすぎによる理解コスト増
 - premature-async: 不要な非同期化
 - temporal-coupling: 呼び順依存
+- wrong-cuts: ドメイン境界ではなく技術都合で分割されている
+- shared-persistency: 複数サービスが同一DBを直接共有している
+- synchronous-chains: 同期呼び出しが数珠つなぎで遅延と障害を伝播する
+- circular-imports: モジュールやレイヤーの依存が循環している
+- divergent-change: 1つのモジュールが多種類の理由で頻繁に変更される
+- shotgun-surgery: 1つの変更のために多数の箇所を同時修正する必要がある
+- anemic-domain-model: ドメインオブジェクトがデータ入れ物化しロジックが外部へ流出している
+- singletonitis: シングルトンやグローバル状態に依存し変更とテストが硬直している
+- source-of-truth-split: 同じ業務事実を複数箇所で更新し整合性が割れている
+- transaction-boundary-leak: 整合性が必要な境界とトランザクション境界が一致していない
+- contract-drift: APIやイベント契約が利用側と乖離している
+- orchestrator-god-service: 1サービスが複数コンテキストの制御を抱え込み肥大化している
+- shared-type-across-contexts: 境界をまたいで型やDTOを共有し独立進化できない
+- observability-blind-spot: 障害時に因果関係を追跡できる観測点が不足している
+- pipeline-jungle: パイプラインが継ぎ足しで複雑化し依存関係が読めない
+- cace-entanglement: 一部変更が全体挙動に波及する強い絡み合いがある
+- large-class: 責務過多でクラスが肥大化している
+- long-method: 関数が長すぎて意図の追跡が難しい
+- long-parameter-list: 引数が多すぎて呼び出しと責務が不明瞭になっている
+- data-clumps: 同じ引数群やデータ群が繰り返し登場する
+- primitive-obsession: ドメイン概念を基本型の組み合わせで無理に表現している
+- feature-envy: 他オブジェクトのデータに過剰依存したロジック配置になっている
+- message-chains: 連鎖呼び出しが深く構造変更に極端に弱い
+- inappropriate-intimacy: モジュール間で実装詳細に過剰依存している
+- duplicate-code: 同一ロジックが複数箇所に重複している
+- middle-man: 実質委譲のみの層が増えインダイレクションが過剰
+- lazy-class: 役割の薄いクラスが増え構造だけ複雑化している
+- broad-exceptions: 例外捕捉が広すぎて障害原因を隠している
+- dead-code: 到達しないコードや使われないAPIが残置されている
+- magic-literals: 意味の説明がない数値や文字列リテラルに依存している
+- print-debugging-leftovers: 本番経路にprintデバッグの痕跡が残っている
+- assertion-roulette: テスト失敗時にどの検証が壊れたか判別しづらい
 
 ## どんでん返しの問い
 
