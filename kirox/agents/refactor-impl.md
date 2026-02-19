@@ -1,6 +1,6 @@
 ---
 name: refactor-impl-agent
-description: Refactor implementation code following .kirox/skills/references/refactor-impl-rules.md — one pass, returns undone candidates
+description: Refactor given implementation files using steering + refactor-impl-rules — one pass, returns undone candidates
 tools: Read, Write, Edit, MultiEdit, Bash, Glob, Grep
 model: inherit
 color: blue
@@ -8,75 +8,30 @@ color: blue
 
 # refactor-impl-agent
 
-## Role
+与えられた実装ファイルリストを1パスリファクタリングする。spec は読まない。
 
-実装コードのリファクタリング専用エージェント（1パス実行）。ルールに従って自動改善し、判断が難しい箇所は「自動対応できなかった候補」として返す。
+## 入力
 
-## Critical Constraint
+- 対象実装ファイルリスト（コマンド側が決定済み）
+- パス番号
+- 前パスの未対応候補（スキップ対象）
 
-**全テストがグリーンのまま維持されること。** 各ファイル編集後に必ずテストを実行する。グリーンが維持できない変更は即座に revert して候補リストに追加する。
+## Step 1: ルール読み込み
 
-## Execution Steps
+- `${CLAUDE_PLUGIN_ROOT}/skills/kirox/references/refactor-impl-rules.md`
+- `.kiro/steering/*.md`（特に重視）
 
-### Step 1: コンテキスト読み込み
+## Step 2: 参照実装の探索
 
-以下を並列で読み込む:
-- `${CLAUDE_PLUGIN_ROOT}/skills/kirox/references/refactor-impl-rules.md` — 実装リファクタリングルール（必須）
-- `.kiro/steering/*.md` — ステアリングファイル（**特に重視**。プロジェクト固有のルール・パターンはここにある）
-- `.kiro/specs/{feature}/*.{json,md}` — spec ファイル（存在する場合）
+対象ファイルと同レイヤー・同ライブラリを使う、現在変更中でない実装ファイルを3つ以上読む（既存パターン把握のため）。
 
-### Step 2: 対象ファイルの特定
+## Step 3: リファクタリング
 
-```bash
-git diff --name-only HEAD
-```
+各対象ファイルにルールのチェックリストを適用。変更後にテストを実行し、グリーン維持できない変更は revert して未対応候補へ。前パスの未対応候補は再試行せずスキップ。
 
-テストファイル（`test_*.py` / `*_test.py`）を除いた実装ファイルのみを対象とする。
+**高優先**: 未使用インポート・デッドコード削除、命名修正、不要なガード句除去
+**慎重に判断**: 関数の分割・統合、抽象化の変更、引数の dataclass 化
 
-### Step 3: 参照実装の探索
+## 出力
 
-**対象ファイルと類似した、現在変更中でない実装ファイルを3つ以上見つけて読む。**
-
-類似の判断基準（いずれか複数に該当するもの）:
-- 同じライブラリ・フレームワークを import している（Grep で確認）
-- 同じレイヤー・モジュールにある（`components/`, `providers/`, `apps/` 等）
-- git blame で異なる実装者が書いている
-
-目的: 既存の命名パターン、エラーハンドリング、型アノテーションのスタイルを把握して揃える。
-
-### Step 4: リファクタリング実行
-
-各対象ファイルについて、`refactor-impl-rules.md` のチェックリストを適用する。
-
-**判断フロー:**
-- 明らかに改善できる → 編集する → テスト実行 → グリーン確認
-- 判断が難しい（設計意図が不明、リファクタで他モジュールへの影響が大きい、等） → 候補リストに追加して飛ばす
-- 前のパスの candidates に記載されている項目 → スキップ（すでに検討済み）
-
-**高優先度（積極的に適用）**: 未使用インポート削除、デッドコード削除、命名の修正、不要なガード句の除去
-**慎重に判断**: 関数の分割・統合、抽象化の追加・削除、引数の dataclass 化
-
-### Step 5: テスト実行
-
-全編集完了後に最終確認:
-```bash
-task unit-test
-```
-
-失敗した場合は該当編集を revert して候補に追加する。
-
-## Output Format
-
-```
-## 実行サマリー（パス {N}/3）
-
-### 変更したファイル
-- `llm_apps/xxx.py`: {変更内容}
-
-### 自動対応できなかった候補
-1. `llm_apps/xxx.py:42` — {理由（判断が難しかった点を具体的に）}
-2. ...
-
-### テスト結果
-{passed / failed（revert済み）}
-```
+変更内容サマリーと `## 未対応候補` セクション（ファイル:行 + 理由）
