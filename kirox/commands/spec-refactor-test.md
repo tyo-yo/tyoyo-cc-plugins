@@ -6,92 +6,21 @@ argument-hint: "[feature-name] [task-numbers]"
 
 # spec-refactor-test
 
-GREEN（テスト通過）後のテストコードのリファクタリングフェーズを実行する。
-refactor-test-agent を3回直列で実行し、自動対応できなかった候補をまとめてインタラクティブに解決する。
+## 対象ファイルの決定
 
-## 引数パース
+1. ブランチ名から feature を推測: `git rev-parse --abbrev-ref HEAD`（引数があれば優先）
+2. `.kiro/specs/{feature}/tasks.md` からテストファイルを抽出（存在する場合）
+3. `git log --name-only -10` で直近の変更ファイルとコミットメッセージを確認
+4. 上記を合わせてリファクタリング対象の **テストファイルリスト** を確定し、ユーザーに明示
 
-- `$1`: feature 名（省略可）
-- `$2`: タスク番号（省略可、"1.1" or "1,2,3" 形式）
+## 3パス実行
 
-**厳密にパースできない場合の推測手順:**
-1. `git rev-parse --abbrev-ref HEAD` でブランチ名を取得（Bash ツール使用）
-2. `work/xxx`, `feature/xxx`, `feat/xxx` 等のパターンから feature 名を抽出
-3. 推測した値をユーザーに明示して続行（確認は求めない）
-4. `.kiro/specs/` に該当ディレクトリがなければ spec なしで続行（git diff のみで判断）
+refactor-test-agent を3回直列で呼び出す。各パスの出力はそのまま表示する。
 
-## 実行: 3パス直列
+渡す情報: 対象ファイルリスト・パス番号（1/3, 2/3, 3/3）・前パスの未対応候補（パス1は空）
 
-各パスで refactor-test-agent を呼び出す。前のパスの「自動対応できなかった候補」を次のパスに引き継ぐ。
+## 完了後
 
-### パス 1
+3パス分の未対応候補を重複排除してまとめ提示 → 1件ずつ対話的に解決。
 
-```
-Task(
-  subagent_type="refactor-test-agent",
-  prompt="""
-Feature: {feature}
-Spec directory: .kiro/specs/{feature}/  (存在する場合のみ参照)
-Target tasks: {task numbers or "recent changes via git diff"}
-Pass: 1/3
-Previous candidates: (none)
-
-File patterns to read:
-- .kiro/specs/{feature}/*.{json,md}  (存在する場合)
-- .kiro/steering/*.md
-"""
-)
-```
-
-パス1の出力から `## 自動対応できなかった候補` セクションを抽出する。
-
-### パス 2
-
-```
-Task(
-  subagent_type="refactor-test-agent",
-  prompt="""
-Pass: 2/3
-Previous candidates from pass 1:
-{pass1_candidates}
-
-（その他は同じ）
-"""
-)
-```
-
-### パス 3
-
-```
-Task(
-  subagent_type="refactor-test-agent",
-  prompt="""
-Pass: 3/3
-Accumulated candidates from passes 1-2:
-{pass1_candidates + pass2_candidates}
-
-（その他は同じ）
-"""
-)
-```
-
-## 3パス完了後: まとめ提示
-
-3パス分の候補を重複排除してまとめ、以下の形式でユーザーに提示する:
-
-```
-## テストリファクタリング候補（自動対応できなかった箇所）
-
-1. `path/to/test_file.py:42` — {理由}
-2. ...
-
-順番に確認しますか？ (y でそのまま 1 件目へ / n でスキップ / done で終了)
-```
-
-## インタラクティブ解決
-
-ユーザーと1件ずつ確認・修正を行う。各解決後:
-
-「この決定を `${CLAUDE_PLUGIN_ROOT}/skills/kirox/references/refactor-test-rules.md` に追記して次回自動化しますか？」
-
-ユーザーが承認した場合のみ追記する。
+承認された決定は `/Users/tyoyo/repos/tyoyo-cc-plugins/kirox/skills/kirox/references/refactor-test-rules.md` に追記する。
