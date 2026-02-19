@@ -15,7 +15,7 @@ color: blue
 - 与えられたファイル、該当コミットのファイル
 
 - テストファイルが与えられた場合: `${CLAUDE_PLUGIN_ROOT}/skills/kirox/references/refactor-test-rules.md`
-- テストファイル以外を含む場合: 
+- テストファイル以外を含む場合: `${CLAUDE_PLUGIN_ROOT}/skills/kirox/references/refactor-impl-rules.md`
 
 - リファクタリングすべき課題と方針を考える
 - 悩ましい箇所は自動で対応せず、ユーザーに課題と方針と懸念事項を伝える
