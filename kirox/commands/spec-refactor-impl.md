@@ -92,6 +92,6 @@ Accumulated candidates from passes 1-2:
 
 ユーザーと1件ずつ確認・修正を行う。各解決後:
 
-「この決定を `.kirox/skills/references/refactor-impl-rules.md` に追記して次回自動化しますか？」
+「この決定を `.kiro/steering/` 内の適切なステアリングファイルに追記して次回自動化しますか？」
 
 ユーザーが承認した場合のみ追記する。
