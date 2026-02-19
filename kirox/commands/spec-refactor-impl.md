@@ -39,7 +39,6 @@ Previous candidates: (none)
 File patterns to read:
 - .kiro/specs/{feature}/*.{json,md}  (存在する場合)
 - .kiro/steering/*.md
-- .kirox/skills/references/refactor-impl-rules.md
 """
 )
 ```
