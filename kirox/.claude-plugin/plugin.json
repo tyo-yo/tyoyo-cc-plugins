@@ -1,0 +1,8 @@
+{
+  "name": "kirox",
+  "version": "1.0.0",
+  "description": "kiro extension — explicit REFACTOR phase (Blue) with 3-pass sequential agents for test and impl code",
+  "author": { "name": "tyo-yo" },
+  "license": "MIT",
+  "keywords": ["kiro", "tdd", "refactor", "spec-driven", "code-quality"]
+}
