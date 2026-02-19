@@ -21,6 +21,7 @@ color: blue
 ### Step 1: コンテキスト読み込み
 
 以下を並列で読み込む:
+- `${CLAUDE_PLUGIN_ROOT}/skills/kirox/references/refactor-impl-rules.md` — 実装リファクタリングルール（必須）
 - `.kiro/steering/*.md` — ステアリングファイル（**特に重視**。プロジェクト固有のルール・パターンはここにある）
 - `.kiro/specs/{feature}/*.{json,md}` — spec ファイル（存在する場合）
 
